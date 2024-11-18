@@ -2,14 +2,14 @@
 #'
 #' Calculates monthly parameters based on rainfall data from a CSV file.
 #'
-#' @param filein A string representing the input CSV file path.
+#' @param data A string representing the input CSV file path.
 #' @param custom_bins A numeric vector specifying custom bins for RFE.
-#' @param count_filter A numeric threshold for filtering counts.
+#' @param count_filter A numeric threshold defining the minimum number of values in each bin to include in the calculations
 #' @param min_rainy_days_threshold A numeric threshold for minimum rainy days.
 #' @return A data frame with the computed monthly parameters.
-compute_monthly_parameters <- function(filein, custom_bins = c(1, 3, 5, 10, 15), count_filter = 10, min_rainy_days_threshold = 10) {
-  # Load the CSV data
-  df <- read.csv(filein)
+compute_monthly_parameters <- function(data, custom_bins = c(1, 3, 5, 10, 15), count_filter = 10, min_rainy_days_threshold = 10) {
+  # If data is a file path, read the CSV; otherwise, assume it's a data frame
+  df <- if (is.character(data)) read.csv(data) else data
   
   # Initialise lists to store results
   months <- c()
@@ -30,7 +30,7 @@ compute_monthly_parameters <- function(filein, custom_bins = c(1, 3, 5, 10, 15),
   # Loop through each month (January to December)
   for (month in 1:12) {
     # Get the correct number of days in the current month (for any reference year, e.g., 2021)
-    last_day <- as.numeric(format(as.Date(paste0("2021-", month, "-01")) + months(1) - days(1), "%d"))
+    last_day <- as.numeric(format(as.Date(paste0("2021-", month, "-01")) + months(1) - lubridate::days(1), "%d"))
     
     # Format the start and end dates for the current month
     start_date <- sprintf("%02d-01", month)
@@ -40,7 +40,7 @@ compute_monthly_parameters <- function(filein, custom_bins = c(1, 3, 5, 10, 15),
     filtered_df <- extract_rows_by_date_range_across_years(df, start_date, end_date)
     
     # Calculate conditional probabilities and other statistics
-    result_df <- calculate_and_plot_conditional_probabilities(filtered_df, custom_bins, count_filter)
+    result_df <- calculate_and_plot_conditional_probabilities(filtered_df, rfe_bin_edges = custom_bins, count_filter)
     #print(month)
     #print(result_df)
     months <- c(months, month)
