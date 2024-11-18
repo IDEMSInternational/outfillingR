@@ -4,14 +4,10 @@
 \alias{select_calibration_data}
 \title{Select Calibration Data}
 \usage{
-select_calibration_data(
-  file_path,
-  rainfall_estimate_column,
-  station_to_exclude
-)
+select_calibration_data(data, rainfall_estimate_column, station_to_exclude)
 }
 \arguments{
-\item{file_path}{A string specifying the file path to the CSV file containing rainfall data.}
+\item{data}{A string specifying the file path to the CSV file containing rainfall data.}
 
 \item{rainfall_estimate_column}{A string representing the column name with rainfall estimates to be used in calibration.}
 
