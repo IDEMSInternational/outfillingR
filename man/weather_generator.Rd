@@ -5,54 +5,106 @@
 \title{Generate Synthetic Rainfall Data}
 \usage{
 weather_generator(
-  datain,
+  data,
+  station,
+  date,
+  rfe,
+  rainfall,
+  metadata = NULL,
+  metadata_station = NULL,
+  lon,
+  lat,
   monthly_params_df,
   distribution_flag = "gamma",
-  markovflag = 1
+  markovflag = TRUE
 )
 }
 \arguments{
-\item{datain}{Either a path to a CSV file containing historical rainfall data
-or a data frame. The data frame must include columns for
-\code{Station_name}, \code{date}, \code{rfe}, \code{rainfall}, \code{lon}, and \code{lat}.}
+\item{data}{Either a path to a CSV file containing historical rainfall data
+or a data frame.}
+
+\item{station}{A string specifying the column name in \code{data} that contains
+the station names.}
+
+\item{date}{A string specifying the column name in \code{data} that contains
+the date values.}
+
+\item{rfe}{A string specifying the column name in \code{data} that contains
+rainfall estimates (RFE) used as predictors for rainfall generation.}
+
+\item{rainfall}{A string specifying the column name in \code{data} that contains
+the original rainfall values.}
+
+\item{metadata}{An optional data frame containing additional metadata to merge
+with the historical data. Default is \code{NULL}.}
+
+\item{metadata_station}{A string specifying the column name in the metadata
+data frame that corresponds to \code{station}.
+If \code{NULL}, it defaults to the value of \code{station}.}
+
+\item{lon}{A string specifying the column corresponding to longitude values.
+If \code{metadata} is \code{NULL}, this column is from \code{data}, otherwise
+this is from \code{metadata}}
+
+\item{lat}{A string specifying the column corresponding to latitude values.
+If \code{metadata} is \code{NULL}, this column is from \code{data}, otherwise
+this is from \code{metadata}}
 
 \item{monthly_params_df}{A data frame containing monthly parameters for
-generating rainfall data. It should include columns
+rainfall generation. This must include columns
 for \code{Month}, \code{b0}, \code{b1}, \code{b0_rainyday}, \code{b1_rainyday},
 \code{b0_dryday}, \code{b1_dryday}, \code{a0}, \code{a1}, \code{kappa},
 \code{theta}, \code{p0}, \code{p0_rainyday}, and \code{p0_dryday}.}
 
-\item{distribution_flag}{A string indicating the distribution to use for
-generating rainfall amounts. Options are 'gamma'
-(default) or 'lognormal'.}
+\item{distribution_flag}{A string specifying the statistical distribution
+to use for generating rainfall amounts. Options
+are \code{"gamma"} (default) or \code{"lognormal"}.}
 
-\item{markovflag}{A binary indicator (default 1) for whether to use a Markov
-chain approach in determining the probability of rainfall.
-If set to 0, the function does not consider previous
-rainfall when calculating probabilities.}
+\item{markovflag}{A logical value indicating whether to use a Markov chain
+approach for rainfall occurrence. If \code{TRUE} (default), the
+probability of rainfall depends on previous conditions.}
 }
 \value{
-A data frame containing the generated rainfall data, including columns
-for \code{Station_name}, \code{date}, \code{lon}, \code{lat}, \code{rfe}, \code{original_rainfall},
-and \code{generated_rainfall}.
+A data frame containing the generated synthetic rainfall data with
+the following columns:
+- \code{Station_name}: The station name.
+- \code{date}: The date.
+- \code{lon}: Longitude of the station.
+- \code{lat}: Latitude of the station.
+- \code{rfe}: Rainfall estimates (RFE) used in the generation process.
+- \code{original_rainfall}: The original rainfall value from \code{data}.
+- \code{generated_rainfall}: The generated synthetic rainfall value.
 }
 \description{
-This function generates synthetic rainfall data based on historical rainfall
-events and specified monthly parameters. It uses a specified statistical
-distribution (gamma or lognormal) to model the rainfall amounts.
+This function generates synthetic rainfall data using historical rainfall
+data and monthly parameters. It applies a specified statistical distribution
+(gamma or lognormal) to model rainfall amounts, optionally using a Markov
+chain to simulate the probability of precipitation based on past conditions.
 }
 \examples{
 # Example usage:
-monthly_params <- data.frame(Month = 1:12, b0 = runif(12), b1 = runif(12), 
-                              b0_rainyday = runif(12), b1_rainyday = runif(12),
-                              b0_dryday = runif(12), b1_dryday = runif(12),
-                              a0 = runif(12), a1 = runif(12), kappa = runif(12),
-                              theta = runif(12), p0 = runif(12),
-                              p0_rainyday = runif(12), p0_dryday = runif(12))
-historical_data <- data.frame(Station_name = "Station A", date = Sys.Date(),
-                               rfe = c(0, 1, 0), rainfall = c(0, 5, 0),
-                               lon = 34.0, lat = -1.0)
-generated_rainfall <- weather_generator(historical_data, monthly_params)
-print(generated_rainfall)
+monthly_params <- data.frame(Month = 1:12, 
+                             b0 = runif(12), b1 = runif(12), 
+                             b0_rainyday = runif(12), b1_rainyday = runif(12),
+                             b0_dryday = runif(12), b1_dryday = runif(12),
+                             a0 = runif(12), a1 = runif(12), 
+                             kappa = runif(12), theta = runif(12), 
+                             p0 = runif(12), 
+                             p0_rainyday = runif(12), p0_dryday = runif(12))
+
+historical_data <- data.frame(Station_name = "Station A", 
+                              date = Sys.Date() + 0:2, 
+                              rfe = c(0.1, 1.2, 0.3), 
+                              rainfall = c(0, 5, 0),
+                              lon = 34.0, lat = -1.0)
+
+generated_rainfall <- weather_generator(data = historical_data, 
+                                        station = "Station_name", 
+                                        date = "date", 
+                                        rfe = "rfe", 
+                                        rainfall = "rainfall", 
+                                        lon = "lon", 
+                                        lat = "lat", 
+                                        monthly_params_df = monthly_params)
 
 }

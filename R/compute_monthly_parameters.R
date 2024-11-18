@@ -30,7 +30,7 @@ compute_monthly_parameters <- function(data, custom_bins = c(1, 3, 5, 10, 15), c
   # Loop through each month (January to December)
   for (month in 1:12) {
     # Get the correct number of days in the current month (for any reference year, e.g., 2021)
-    last_day <- as.numeric(format(as.Date(paste0("2021-", month, "-01")) + months(1) - lubridate::days(1), "%d"))
+    last_day <- as.numeric(format(as.Date(paste0("2021-", month, "-01")) + lubridate::period(months = 1) - lubridate::days(1), "%d"))
     
     # Format the start and end dates for the current month
     start_date <- sprintf("%02d-01", month)

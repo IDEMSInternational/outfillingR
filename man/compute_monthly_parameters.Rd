@@ -5,18 +5,18 @@
 \title{Compute Monthly Parameters}
 \usage{
 compute_monthly_parameters(
-  filein,
+  data,
   custom_bins = c(1, 3, 5, 10, 15),
   count_filter = 10,
   min_rainy_days_threshold = 10
 )
 }
 \arguments{
-\item{filein}{A string representing the input CSV file path.}
+\item{data}{A string representing the input CSV file path.}
 
 \item{custom_bins}{A numeric vector specifying custom bins for RFE.}
 
-\item{count_filter}{A numeric threshold for filtering counts.}
+\item{count_filter}{A numeric threshold defining the minimum number of values in each bin to include in the calculations}
 
 \item{min_rainy_days_threshold}{A numeric threshold for minimum rainy days.}
 }

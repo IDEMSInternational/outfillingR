@@ -1,47 +1,86 @@
 #' Generate Synthetic Rainfall Data
 #'
-#' This function generates synthetic rainfall data based on historical rainfall 
-#' events and specified monthly parameters. It uses a specified statistical 
-#' distribution (gamma or lognormal) to model the rainfall amounts.
+#' This function generates synthetic rainfall data using historical rainfall 
+#' data and monthly parameters. It applies a specified statistical distribution 
+#' (gamma or lognormal) to model rainfall amounts, optionally using a Markov 
+#' chain to simulate the probability of precipitation based on past conditions.
 #'
 #' @param data Either a path to a CSV file containing historical rainfall data 
-#'             or a data frame. The data frame must include columns for 
-#'             `station`, `date`, `rfe`, `rainfall`, `lon`, and `lat`.
+#'             or a data frame.
+#' @param station A string specifying the column name in `data` that contains 
+#'                the station names.
+#' @param date A string specifying the column name in `data` that contains 
+#'             the date values.
+#' @param rfe A string specifying the column name in `data` that contains 
+#'            rainfall estimates (RFE) used as predictors for rainfall generation.
+#' @param rainfall A string specifying the column name in `data` that contains 
+#'                 the original rainfall values.
+#' @param metadata An optional data frame containing additional metadata to merge 
+#'                 with the historical data. Default is `NULL`.
+#' @param metadata_station A string specifying the column name in the metadata 
+#'                         data frame that corresponds to `station`. 
+#'                         If `NULL`, it defaults to the value of `station`.
+#' @param lon A string specifying the column corresponding to longitude values.
+#'            If `metadata` is `NULL`, this column is from `data`, otherwise
+#'            this is from `metadata`
+#' @param lat A string specifying the column corresponding to latitude values.
+#'            If `metadata` is `NULL`, this column is from `data`, otherwise
+#'            this is from `metadata`
 #' @param monthly_params_df A data frame containing monthly parameters for 
-#'                          generating rainfall data. It should include columns 
+#'                          rainfall generation. This must include columns 
 #'                          for `Month`, `b0`, `b1`, `b0_rainyday`, `b1_rainyday`, 
 #'                          `b0_dryday`, `b1_dryday`, `a0`, `a1`, `kappa`, 
 #'                          `theta`, `p0`, `p0_rainyday`, and `p0_dryday`.
-#' @param distribution_flag A string indicating the distribution to use for 
-#'                          generating rainfall amounts. Options are 'gamma' 
-#'                          (default) or 'lognormal'.
-#' @param markovflag A logical value (default `TRUE`) for whether to use a Markov 
-#'                   chain approach in determining the probability of rainfall. 
-#'                   If `FALSE`, the function does not consider previous 
-#'                   rainfall when calculating probabilities.
+#' @param distribution_flag A string specifying the statistical distribution 
+#'                          to use for generating rainfall amounts. Options 
+#'                          are `"gamma"` (default) or `"lognormal"`.
+#' @param markovflag A logical value indicating whether to use a Markov chain 
+#'                   approach for rainfall occurrence. If `TRUE` (default), the 
+#'                   probability of rainfall depends on previous conditions.
 #'
-#' @return A data frame containing the generated rainfall data, including columns 
-#'         for `Station_name`, `date`, `lon`, `lat`, `rfe`, `original_rainfall`, 
-#'         and `generated_rainfall`.
+#' @return A data frame containing the generated synthetic rainfall data with 
+#'         the following columns:
+#'         - `Station_name`: The station name.
+#'         - `date`: The date.
+#'         - `lon`: Longitude of the station.
+#'         - `lat`: Latitude of the station.
+#'         - `rfe`: Rainfall estimates (RFE) used in the generation process.
+#'         - `original_rainfall`: The original rainfall value from `data`.
+#'         - `generated_rainfall`: The generated synthetic rainfall value.
 #'
 #' @examples
 #' # Example usage:
-#' monthly_params <- data.frame(Month = 1:12, b0 = runif(12), b1 = runif(12), 
-#'                               b0_rainyday = runif(12), b1_rainyday = runif(12),
-#'                               b0_dryday = runif(12), b1_dryday = runif(12),
-#'                               a0 = runif(12), a1 = runif(12), kappa = runif(12),
-#'                               theta = runif(12), p0 = runif(12),
-#'                               p0_rainyday = runif(12), p0_dryday = runif(12))
-#' historical_data <- data.frame(Station_name = "Station A", date = Sys.Date(),
-#'                                rfe = c(0, 1, 0), rainfall = c(0, 5, 0),
-#'                                lon = 34.0, lat = -1.0)
-#' generated_rainfall <- weather_generator(historical_data, monthly_params)
-#' 
+#' monthly_params <- data.frame(Month = 1:12, 
+#'                              b0 = runif(12), b1 = runif(12), 
+#'                              b0_rainyday = runif(12), b1_rainyday = runif(12),
+#'                              b0_dryday = runif(12), b1_dryday = runif(12),
+#'                              a0 = runif(12), a1 = runif(12), 
+#'                              kappa = runif(12), theta = runif(12), 
+#'                              p0 = runif(12), 
+#'                              p0_rainyday = runif(12), p0_dryday = runif(12))
+#'
+#' historical_data <- data.frame(Station_name = "Station A", 
+#'                               date = Sys.Date() + 0:2, 
+#'                               rfe = c(0.1, 1.2, 0.3), 
+#'                               rainfall = c(0, 5, 0),
+#'                               lon = 34.0, lat = -1.0)
+#'
+#' generated_rainfall <- weather_generator(data = historical_data, 
+#'                                         station = "Station_name", 
+#'                                         date = "date", 
+#'                                         rfe = "rfe", 
+#'                                         rainfall = "rainfall", 
+#'                                         lon = "lon", 
+#'                                         lat = "lat", 
+#'                                         monthly_params_df = monthly_params)
+#'
 weather_generator <- function(data,
                               station,
                               date,
                               rfe,
                               rainfall,
+                              metadata = NULL,
+                              metadata_station = NULL,
                               lon,
                               lat,
                               monthly_params_df,
@@ -53,6 +92,13 @@ weather_generator <- function(data,
   
   generated_rainfall <- 0  # Initialise the generated rainfall
   generated_data <- list()  # Initialise list to store generated data
+  
+  if (!is.null(metadata)) {
+    if (is.null(metadata_station)) metadata_station = station
+    df <- dplyr::full_join(df, metadata, by = setNames(metadata_station, station)) # Use setNames for variable names
+  }
+  
+  return(df)
   
   # Loop through each row of the data
   for (i in seq_len(nrow(df))) {
@@ -161,7 +207,7 @@ weather_generator <- function(data,
     
     # Store the generated data in the list
     generated_data[[i]] <- list(
-      Station_name = station_name,
+      station_name = station_name,
       date = date_col,
       lon = row[[lon]],
       lat = row[[lat]],
