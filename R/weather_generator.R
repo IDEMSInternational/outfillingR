@@ -71,8 +71,6 @@ weather_generator <- function(data,
     df <- dplyr::full_join(df, metadata, by = stats::setNames(metadata_station, station))
   }
   
-  return(df)
-  
   # Loop through each row of the data
   for (i in seq_len(nrow(df))) {
     row <- df[i, ]
