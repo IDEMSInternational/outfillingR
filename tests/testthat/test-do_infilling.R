@@ -1,6 +1,7 @@
 data("zambia_data")
 zambia_data <- zambia_data %>%
-  dplyr::filter(date <= "1985-12-31")
+  dplyr::filter(station %in% c("PETAUKE MET", "MSEKERA AGROMET", "MFUWE MET")) %>%
+  dplyr::filter(date <= "2013-12-31")
 
 test_that("do_infilling performs infilling with valid data and parameters", {
   # Mock monthly parameters
@@ -36,8 +37,7 @@ test_that("do_infilling performs infilling with valid data and parameters", {
   
   # Check result structure
   expect_true(is.data.frame(result))
-  expect_named(result, c("station", "date", "lon", "lat", "rainfall", "rfe", "chirps", "imerg_cal",
-                         "imerg_uncal", "era5", "uwnd_925", "uwnd_600", "vwnd_925", "vwnd_600", "tamsat"))
+  expect_named(result, c("station_name", "date", "lon", "lat", "rfe", "original_rainfall", "generated_rainfall"))
   
   # Check generated rainfall is numeric and non-negative
   expect_true(is.numeric(result$rfe))

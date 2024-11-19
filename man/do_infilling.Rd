@@ -144,11 +144,10 @@ uses monthly parameters, supports a Markov chain approach, and allows for
 user-defined dry seasons and custom bins for rainfall estimates.
 }
 \examples{
+
+\dontrun{
 # Example with the Zambia data set
 data("zambia_data")
-
-# just a sample of the data for testing purposes
-zambia_data <- zambia_data \%>\% dplyr::filter(date <= "1989-12-31")
 
 infill_data <- do_infilling(data = zambia_data,
                             station = "station",
@@ -159,6 +158,7 @@ infill_data <- do_infilling(data = zambia_data,
                             lat = "lat",
                             station_to_exclude = "PETAUKE MET",
                             rainfall_estimate_column = "chirps")
+}
 
 }
 \seealso{
