@@ -71,8 +71,6 @@ weather_generator <- function(data,
     df <- dplyr::full_join(df, metadata, by = stats::setNames(metadata_station, station))
   }
   
-  return(df)
-  
   # Loop through each row of the data
   for (i in seq_len(nrow(df))) {
     row <- df[i, ]
@@ -100,14 +98,6 @@ weather_generator <- function(data,
     p0 <- monthly_params$p0
     p0_rainyday <- monthly_params$p0_rainyday
     p0_dryday <- monthly_params$p0_dryday
-    
-    
-    # what's going on?
-    
-    # b0_dryday <- -0.2
-    # b1_dryday <- 0.05
-    # b0_rainyday <- -0.2
-    # b1_rainyday <- 0.05
     
     if (is.na(rfe_col)) {
       # If rfe_col is NA, set generated rainfall to NA
