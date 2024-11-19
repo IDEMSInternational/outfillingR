@@ -109,7 +109,8 @@ infilled_data <- do_infilling(
 )
 
 # View the results
-head(infilled_data)
+head(infilled_data) %>%
+  knitr::kable()
 ```
 
 ## Contributing
