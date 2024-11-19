@@ -12,6 +12,9 @@ calibrate_kappa_theta <- function(filtered_probabilities_df) {
   rainfall_means <- filtered_probabilities_df$Rainfall_Mean
   rainfall_stds <- filtered_probabilities_df$Rainfall_Std
   
+  if (any(rainfall_means < 0)){ stop("Rainfall mean values less than 0")}
+  if (any(rainfall_stds < 0)){ stop("Rainfall SD values less than 0")}
+  
   # Log-transform: log(variance) vs log(mean)
   log_mean_rainfall <- log(rainfall_means)
   log_variance_rainfall <- log(rainfall_stds^2)

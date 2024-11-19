@@ -9,6 +9,7 @@
 #' @return A numeric vector with NA values filled by the nearest non-NA values.
 #'         The original order of the vector is preserved.
 fill_nearest <- function(x) {
+  if (all(is.na(x))) {stop("At least one value in `x` cannot be missing.")}
   # Find the index of non-NA values
   non_na_idx <- which(!is.na(x))
   

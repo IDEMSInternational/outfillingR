@@ -32,8 +32,3 @@ This function reads a CSV file containing rainfall data, selects the relevant
 column for rainfall estimates, and excludes data from a specified station for calibration.
 It outputs a CSV file with the filtered calibration data.
 }
-\examples{
-# Select calibration data from "rainfall_data.csv" excluding "Station_A" 
-# with rainfall estimates from the column "Rainfall_Estimate"
-# calibration_data <- select_calibration_data("rainfall_data.csv", "Rainfall_Estimate", "Station_A")
-}

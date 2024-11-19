@@ -11,12 +11,6 @@
 #' @param station_to_exclude A string representing the name of the station to exclude from the calibration data.
 #' @param save A logical column indicating whether to save the resulting data frame or not. Default `FALSE`.
 #' @return A data frame with the calibration data (without rows from the excluded station).
-#' @export
-#' 
-#' @examples
-#' # Select calibration data from "rainfall_data.csv" excluding "Station_A" 
-#' # with rainfall estimates from the column "Rainfall_Estimate"
-#' # calibration_data <- select_calibration_data("rainfall_data.csv", "Rainfall_Estimate", "Station_A")
 select_calibration_data <- function(data, station, rainfall_estimate_column, station_to_exclude, save = FALSE) {
   
   # If data is a file path, read the CSV; otherwise, assume it's a data frame

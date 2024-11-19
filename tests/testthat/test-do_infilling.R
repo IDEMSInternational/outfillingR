@@ -1,0 +1,71 @@
+data("zambia_data")
+zambia_data <- zambia_data %>%
+  dplyr::filter(date <= "1985-12-31")
+
+test_that("do_infilling performs infilling with valid data and parameters", {
+  # Mock monthly parameters
+  monthly_params <- data.frame(
+    Month = 1:12,
+    b0 = rep(0.5, 12),
+    b1 = rep(0.1, 12),
+    b0_rainyday = rep(0.5, 12),
+    b1_rainyday = rep(0.1, 12),
+    b0_dryday = rep(0.3, 12),
+    b1_dryday = rep(0.05, 12),
+    a0 = rep(0.2, 12),
+    a1 = rep(0.1, 12),
+    kappa = rep(1, 12),
+    theta = rep(0.5, 12),
+    p0 = rep(0.2, 12),
+    p0_rainyday = rep(0.3, 12),
+    p0_dryday = rep(0.1, 12)
+  )
+  
+  # Call the function
+  result <- do_infilling(
+    data = zambia_data,
+    station = "station",
+    date = "date",
+    rainfall = "rainfall",
+    rfe = "rfe",
+    lon = "lon",
+    lat = "lat",
+    station_to_exclude = "PETAUKE MET",
+    rainfall_estimate_column = "chirps"
+  )
+  
+  # Check result structure
+  expect_true(is.data.frame(result))
+  expect_named(result, c("station", "date", "lon", "lat", "rainfall", "rfe", "chirps", "imerg_cal",
+                         "imerg_uncal", "era5", "uwnd_925", "uwnd_600", "vwnd_925", "vwnd_600", "tamsat"))
+  
+  # Check generated rainfall is numeric and non-negative
+  expect_true(is.numeric(result$rfe))
+  expect_true(all(result$rfe >= 0, na.rm = TRUE))
+})
+
+test_that("do_infilling handles missing values correctly", {
+  # Mock data with missing values
+  historical_data <- zambia_data
+  historical_data$rfe <- NA
+  historical_data$rainfall <- NA
+  
+  # Call the function
+  result <- do_infilling(
+    data = historical_data,
+    station = "station",
+    date = "date",
+    rainfall = "rainfall",
+    rfe = "rfe",
+    lon = "lon",
+    lat = "lat",
+    station_to_exclude = "PETAUKE MET",
+    rainfall_estimate_column = "chirps",
+    custom_bins = c(0.5, 1.5),
+    count_filter = 1,
+    min_rainy_days_threshold = 1
+  )
+  
+  # Check that generated rainfall is NA
+  expect_true(all(is.na(result$rfe)))
+})
