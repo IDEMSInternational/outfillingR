@@ -4,14 +4,25 @@
 \alias{select_calibration_data}
 \title{Select Calibration Data}
 \usage{
-select_calibration_data(data, rainfall_estimate_column, station_to_exclude)
+select_calibration_data(
+  data,
+  station,
+  rainfall_estimate_column,
+  station_to_exclude,
+  save = FALSE
+)
 }
 \arguments{
 \item{data}{A string specifying the file path to the CSV file containing rainfall data.}
 
+\item{station}{A string specifying the column name in \code{data} that contains
+the station names.}
+
 \item{rainfall_estimate_column}{A string representing the column name with rainfall estimates to be used in calibration.}
 
 \item{station_to_exclude}{A string representing the name of the station to exclude from the calibration data.}
+
+\item{save}{A logical column indicating whether to save the resulting data frame or not. Default \code{FALSE}.}
 }
 \value{
 A data frame with the calibration data (without rows from the excluded station).
@@ -20,9 +31,4 @@ A data frame with the calibration data (without rows from the excluded station).
 This function reads a CSV file containing rainfall data, selects the relevant
 column for rainfall estimates, and excludes data from a specified station for calibration.
 It outputs a CSV file with the filtered calibration data.
-}
-\examples{
-# Select calibration data from "rainfall_data.csv" excluding "Station_A" 
-# with rainfall estimates from the column "Rainfall_Estimate"
-# calibration_data <- select_calibration_data("rainfall_data.csv", "Rainfall_Estimate", "Station_A")
 }

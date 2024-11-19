@@ -76,30 +76,21 @@
 #'         for station name, date, RFE, original rainfall, and generated rainfall.
 #'
 #' @examples
-#' # Example data
-#' historical_data <- data.frame(
-#'   Station_name = c("Station A", "Station B"),
-#'   date = as.Date(c("2023-01-01", "2023-01-02")),
-#'   rainfall = c(5, 10),
-#'   rfe = c(0.5, 1.2),
-#'   lon = c(34.5, 34.6),
-#'   lat = c(-1.5, -1.6)
-#' )
-#'
-#' # Perform infilling
-#' infilled_data <- do_infilling(
-#'   data = historical_data,
-#'   station = "Station_name",
-#'   date = "date",
-#'   rainfall = "rainfall",
-#'   rfe = "rfe",
-#'   lon = "lon",
-#'   lat = "lat",
-#'   station_to_exclude = "Station A",
-#'   rainfall_estimate_column = "rfe"
-#' )
-#'
-#' print(infilled_data)
+#' # Example with the Zambia data set
+#' data("zambia_data")
+#' 
+#' # just a sample of the data for testing purposes
+#' zambia_data <- zambia_data %>% dplyr::filter(date <= "1989-12-31")
+#' 
+#' infill_data <- do_infilling(data = zambia_data,
+#'                             station = "station",
+#'                             date = "date",
+#'                             rainfall = "rainfall",
+#'                             rfe = "rfe",
+#'                             lon = "lon",
+#'                             lat = "lat",
+#'                             station_to_exclude = "PETAUKE MET",
+#'                             rainfall_estimate_column = "chirps")
 #'
 #' @seealso \code{\link{weather_generator}}, \code{\link{compute_monthly_parameters}}
 do_infilling <- function(data,
@@ -134,7 +125,7 @@ do_infilling <- function(data,
                          
 ){
   distribution_flag <- match.arg(distribution_flag)
-  calibration_data <- select_calibration_data(data, rainfall_estimate_column, station_to_exclude)
+  calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
   
   # Call the function to compute monthly parameters
   dry_season_params <- list(
@@ -153,7 +144,6 @@ do_infilling <- function(data,
     p0_dryday = p0_dryday
   )
   
-  # in here....!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   monthly_parameters <- compute_monthly_parameters(data = calibration_data,
                                                    custom_bins = custom_bins,
                                                    count_filter = count_filter,

@@ -144,30 +144,21 @@ uses monthly parameters, supports a Markov chain approach, and allows for
 user-defined dry seasons and custom bins for rainfall estimates.
 }
 \examples{
-# Example data
-historical_data <- data.frame(
-  Station_name = c("Station A", "Station B"),
-  date = as.Date(c("2023-01-01", "2023-01-02")),
-  rainfall = c(5, 10),
-  rfe = c(0.5, 1.2),
-  lon = c(34.5, 34.6),
-  lat = c(-1.5, -1.6)
-)
+# Example with the Zambia data set
+data("zambia_data")
 
-# Perform infilling
-infilled_data <- do_infilling(
-  data = historical_data,
-  station = "Station_name",
-  date = "date",
-  rainfall = "rainfall",
-  rfe = "rfe",
-  lon = "lon",
-  lat = "lat",
-  station_to_exclude = "Station A",
-  rainfall_estimate_column = "rfe"
-)
+# just a sample of the data for testing purposes
+zambia_data <- zambia_data \%>\% dplyr::filter(date <= "1989-12-31")
 
-print(infilled_data)
+infill_data <- do_infilling(data = zambia_data,
+                            station = "station",
+                            date = "date",
+                            rainfall = "rainfall",
+                            rfe = "rfe",
+                            lon = "lon",
+                            lat = "lat",
+                            station_to_exclude = "PETAUKE MET",
+                            rainfall_estimate_column = "chirps")
 
 }
 \seealso{

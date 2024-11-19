@@ -27,7 +27,6 @@ calculate_and_plot_conditional_probabilities <- function(filtered_df, rfe_bin_ed
   # Calculate p0: Probability of rainfall > 0 when RFE is zero
   zero_rfe_df <- filtered_df %>% dplyr::filter(rfe == 0)
   
-  # when there's no dplyr??
   p0 <- mean(zero_rfe_df$rainfall > 0, na.rm = TRUE)
   
   # Calculate p0_rainyday and p0_dryday

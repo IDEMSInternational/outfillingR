@@ -47,33 +47,6 @@
 #'         - `rfe`: Rainfall estimates (RFE) used in the generation process.
 #'         - `original_rainfall`: The original rainfall value from `data`.
 #'         - `generated_rainfall`: The generated synthetic rainfall value.
-#'
-#' @examples
-#' # Example usage:
-#' monthly_params <- data.frame(Month = 1:12, 
-#'                              b0 = runif(12), b1 = runif(12), 
-#'                              b0_rainyday = runif(12), b1_rainyday = runif(12),
-#'                              b0_dryday = runif(12), b1_dryday = runif(12),
-#'                              a0 = runif(12), a1 = runif(12), 
-#'                              kappa = runif(12), theta = runif(12), 
-#'                              p0 = runif(12), 
-#'                              p0_rainyday = runif(12), p0_dryday = runif(12))
-#'
-#' historical_data <- data.frame(Station_name = "Station A", 
-#'                               date = Sys.Date() + 0:2, 
-#'                               rfe = c(0.1, 1.2, 0.3), 
-#'                               rainfall = c(0, 5, 0),
-#'                               lon = 34.0, lat = -1.0)
-#'
-#' generated_rainfall <- weather_generator(data = historical_data, 
-#'                                         station = "Station_name", 
-#'                                         date = "date", 
-#'                                         rfe = "rfe", 
-#'                                         rainfall = "rainfall", 
-#'                                         lon = "lon", 
-#'                                         lat = "lat", 
-#'                                         monthly_params_df = monthly_params)
-#'
 weather_generator <- function(data,
                               station,
                               date,
