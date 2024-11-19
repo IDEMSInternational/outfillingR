@@ -161,7 +161,7 @@ weather_generator <- function(data,
             shape <- mean_rainfall^2 / variance_rainfall
             scale <- variance_rainfall / mean_rainfall
             
-            generated_rainfall <- rgamma(1, shape=shape, scale=scale)
+            generated_rainfall <- stats::rgamma(1, shape=shape, scale=scale)
             #ECB note. In R the generated rainfall seems to blow up sometimes when rfe_col is low. This is a temporary fix
             
           }
