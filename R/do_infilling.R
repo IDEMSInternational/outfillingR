@@ -134,7 +134,7 @@ do_infilling <- function(data,
                          
 ){
   distribution_flag <- match.arg(distribution_flag)
-  calibration_data <- select_calibration_data(data, rainfall_estimate_column, station_to_exclude)
+  calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
   
   # Call the function to compute monthly parameters
   dry_season_params <- list(
@@ -153,7 +153,6 @@ do_infilling <- function(data,
     p0_dryday = p0_dryday
   )
   
-  # in here....!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   monthly_parameters <- compute_monthly_parameters(data = calibration_data,
                                                    custom_bins = custom_bins,
                                                    count_filter = count_filter,

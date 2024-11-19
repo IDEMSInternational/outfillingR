@@ -4,14 +4,25 @@
 \alias{select_calibration_data}
 \title{Select Calibration Data}
 \usage{
-select_calibration_data(data, rainfall_estimate_column, station_to_exclude)
+select_calibration_data(
+  data,
+  station,
+  rainfall_estimate_column,
+  station_to_exclude,
+  save = FALSE
+)
 }
 \arguments{
 \item{data}{A string specifying the file path to the CSV file containing rainfall data.}
 
+\item{station}{A string specifying the column name in \code{data} that contains
+the station names.}
+
 \item{rainfall_estimate_column}{A string representing the column name with rainfall estimates to be used in calibration.}
 
 \item{station_to_exclude}{A string representing the name of the station to exclude from the calibration data.}
+
+\item{save}{A logical column indicating whether to save the resulting data frame or not. Default \code{FALSE}.}
 }
 \value{
 A data frame with the calibration data (without rows from the excluded station).
