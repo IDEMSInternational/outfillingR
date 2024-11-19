@@ -61,14 +61,14 @@ weather_generator <- function(data,
                               markovflag = TRUE) {
   
   # If data is a file path, read the CSV; otherwise, assume it's a data frame
-  df <- if (is.character(data)) read.csv(data) else data
+  df <- if (is.character(data)) utils::read.csv(data) else data
   
   generated_rainfall <- 0  # Initialise the generated rainfall
   generated_data <- list()  # Initialise list to store generated data
   
   if (!is.null(metadata)) {
     if (is.null(metadata_station)) metadata_station = station
-    df <- dplyr::full_join(df, metadata, by = setNames(metadata_station, station)) # Use setNames for variable names
+    df <- dplyr::full_join(df, metadata, by = stats::setNames(metadata_station, station))
   }
   
   return(df)
@@ -140,7 +140,7 @@ weather_generator <- function(data,
       prob_precipitation <- max(0, min(prob_precipitation, 1))
       
       # Determine if rainfall occurred (Bernoulli trial)
-      rain_occurred <- rbinom(1, 1, prob_precipitation)
+      rain_occurred <- stats::rbinom(1, 1, prob_precipitation)
       
       # If rain occurred, calculate the amount
       if (rain_occurred == 1) {
@@ -153,7 +153,7 @@ weather_generator <- function(data,
             scale <- variance_rainfall / mean_rainfall
             
             # Sample from the Gamma distribution
-            generated_rainfall <- rgamma(1, shape=shape, scale=scale)
+            generated_rainfall <- stats::rgamma(1, shape=shape, scale=scale)
             
           } else {
             variance_rainfall <- kappa * (0.1 ^ theta)
@@ -161,7 +161,7 @@ weather_generator <- function(data,
             shape <- mean_rainfall^2 / variance_rainfall
             scale <- variance_rainfall / mean_rainfall
             
-            generated_rainfall <- rgamma(1, shape=shape, scale=scale)
+            generated_rainfall <- stats::rgamma(1, shape=shape, scale=scale)
             #ECB note. In R the generated rainfall seems to blow up sometimes when rfe_col is low. This is a temporary fix
             
           }
@@ -171,7 +171,7 @@ weather_generator <- function(data,
           variance_rainfall <- kappa * (rfe_col ^ theta)
           
           # Sample from the log-normal distribution
-          generated_rainfall <- rlnorm(1, log(mean_rainfall), sqrt(variance_rainfall))
+          generated_rainfall <- stats::rlnorm(1, log(mean_rainfall), sqrt(variance_rainfall))
         }
       } else {
         generated_rainfall <- 0

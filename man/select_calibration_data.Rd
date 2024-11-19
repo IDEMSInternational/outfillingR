@@ -13,7 +13,8 @@ select_calibration_data(
 )
 }
 \arguments{
-\item{data}{A string specifying the file path to the CSV file containing rainfall data.}
+\item{data}{Either a path to a CSV file containing historical rainfall data
+or a data frame.}
 
 \item{station}{A string specifying the column name in \code{data} that contains
 the station names.}

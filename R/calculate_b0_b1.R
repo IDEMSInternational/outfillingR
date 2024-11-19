@@ -23,11 +23,11 @@ calculate_b0_b1 <- function(mean_rfe, conditional_prob_rain, bin_counts, min_rai
   
   tryCatch({
     # Fit logistic model using non-linear least squares
-    fit <- nls(conditional_prob_rain ~ logistic_function(mean_rfe, b0, b1),
-               start = list(b0 = 0, b1 = 0), control = list(maxiter = 10000))
+    fit <- stats::nls(conditional_prob_rain ~ logistic_function(mean_rfe, b0, b1),
+                      start = list(b0 = 0, b1 = 0), control = list(maxiter = 10000))
     
     # Extract coefficients b0 and b1
-    coef_fit <- coef(fit)
+    coef_fit <- stats::coef(fit)
     b0 <- coef_fit['b0']
     b1 <- coef_fit['b1']
     
