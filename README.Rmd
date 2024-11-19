@@ -13,44 +13,104 @@ knitr::opts_chunk$set(
 )
 ```
 
-# outfillingR
-
 <!-- badges: start -->
-[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/IDEMSInternational/outfillingR/workflows/R-CMD-check/badge.svg)](https://github.com/IDEMSInternational/outfillingR/actions)
+[![Codecov test coverage](https://codecov.io/gh/IDEMSInternational/outfillingR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/IDEMSInternational/outfillingR?branch=main)
+[![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
+[![Project Status: WIP – Initial development is in progress, but there
+has not yet been a stable, usable release suitable for the
+public.](https://www.repostatus.org/badges/latest/wip.svg)](https://www.repostatus.org/#wip)
+[![CRAN
+status](https://www.r-pkg.org/badges/version/outfillingR)](https://CRAN.R-project.org/package=outfillingR)
+[![license](https://img.shields.io/badge/license-LGPL%20(%3E=%203)-lightgrey.svg)](https://www.gnu.org/licenses/lgpl-3.0.en.html)
 <!-- badges: end -->
 
-The goal of outfillingR is to ...
+## Overview
+
+`outfillingR` is an R package designed to address missing data through infilling and outfilling methods. The package is particularly suited for environmental and meteorological data, including rainfall datasets, and allows users to incorporate statistical distributions, custom bins, and Markov chain techniques into their workflows.
 
 ## Installation
 
-You can install the development version of outfillingR from [GitHub](https://github.com/) with:
+Install the development version from GitHub with:
 
-``` r
-# install.packages("devtools")
+```{r, eval = FALSE}
+#install.packages("devtools")
 devtools::install_github("IDEMSInternational/outfillingR")
 ```
 
-## Example
+## Examples
 
-This is a basic example which shows you how to solve a common problem:
+Here is an example of infilling data.
 
-```{r example}
+```{r, message = FALSE, warning = FALSE}
+# Load the outfillingR library
 library(outfillingR)
-## basic example code
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+```{r, message = FALSE, warning = FALSE, eval=FALSE, include=TRUE}
+# Load example dataset included with the package
+data("zambia_data") 
 
-```{r cars}
-summary(cars)
+# Explore the dataset
+head(zambia_data)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this. You could also use GitHub Actions to re-render `README.Rmd` every time you push. An example workflow can be found here: <https://github.com/r-lib/actions/tree/v1/examples>.
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+# Load example dataset included with the package
+data("zambia_data") 
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+# Explore the dataset
+head(zambia_data) %>%
+  knitr::kable()
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+```{r, message = FALSE, warning = FALSE, eval=FALSE, include=TRUE}
+# Perform infilling using default parameters
+infilled_data <- do_infilling(
+  data = zambia_data,
+  station = "Station_name",
+  date = "date",
+  rainfall = "rainfall",
+  rfe = "rfe",
+  lon = "lon",
+  lat = "lat",
+  station_to_exclude = "Station A",
+  rainfall_estimate_column = "rfe",
+  custom_bins = c(1, 5, 10, 15, 20),
+  count_filter = 5,
+  min_rainy_days_threshold = 30,
+  target_months = c(5, 6, 7, 8, 9),
+  distribution_flag = "gamma",
+  markovflag = TRUE
+)
+
+# View the results
+head(infilled_data)
+```
+
+```{r, message = FALSE, warning = FALSE, echo = FALSE}
+# Perform infilling using default parameters
+infilled_data <- do_infilling(
+  data = zambia_data,
+  station = "Station_name",
+  date = "date",
+  rainfall = "rainfall",
+  rfe = "rfe",
+  lon = "lon",
+  lat = "lat",
+  station_to_exclude = "Station A",
+  rainfall_estimate_column = "rfe",
+  custom_bins = c(1, 5, 10, 15, 20),
+  count_filter = 5,
+  min_rainy_days_threshold = 30,
+  target_months = c(5, 6, 7, 8, 9),
+  distribution_flag = "gamma",
+  markovflag = TRUE
+)
+
+# View the results
+head(infilled_data)
+```
+
+## Contributing
+We welcome contributions! If you'd like to contribute, please submit a pull request or file an issue on the GitHub repository.
