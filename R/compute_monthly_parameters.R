@@ -2,14 +2,15 @@
 #'
 #' Calculates monthly parameters based on rainfall data from a CSV file.
 #'
-#' @param data A string representing the input CSV file path.
+#' @param data Either a path to a CSV file containing historical rainfall data 
+#'             or a data frame.
 #' @param custom_bins A numeric vector specifying custom bins for RFE.
 #' @param count_filter A numeric threshold defining the minimum number of values in each bin to include in the calculations
 #' @param min_rainy_days_threshold A numeric threshold for minimum rainy days.
 #' @return A data frame with the computed monthly parameters.
 compute_monthly_parameters <- function(data, custom_bins = c(1, 3, 5, 10, 15), count_filter = 10, min_rainy_days_threshold = 10) {
   # If data is a file path, read the CSV; otherwise, assume it's a data frame
-  df <- if (is.character(data)) read.csv(data) else data
+  df <- if (is.character(data)) utils::read.csv(data) else data
   
   # Initialise lists to store results
   months <- c()
@@ -69,9 +70,9 @@ compute_monthly_parameters <- function(data, custom_bins = c(1, 3, 5, 10, 15), c
       yvals <- result_df$filtered_probabilities_df$Rainfall_Mean
       
       # Perform linear regression for a0 and a1
-      lm_model <- lm(yvals ~ xvals)
-      a0 <- max(0, coef(lm_model)[1])
-      a1 <- coef(lm_model)[2]
+      lm_model <- stats::lm(yvals ~ xvals)
+      a0 <- max(0, stats::coef(lm_model)[1])
+      a1 <- stats::coef(lm_model)[2]
       
       # Calculate b0 and b1
       #result_df$mean_rfe <- result_df$filtered_probabilities_df$Average_RFE

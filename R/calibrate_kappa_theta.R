@@ -22,11 +22,11 @@ calibrate_kappa_theta <- function(filtered_probabilities_df) {
   # Only perform regression if we have more than 3 data points
   if (length(log_mean_rainfall) > 3) {
     # Linear regression: log(variance) ~ log(mean)
-    fit <- lm(log_variance_rainfall ~ log_mean_rainfall)
+    fit <- stats::lm(log_variance_rainfall ~ log_mean_rainfall)
     
     # Extract slope (theta) and intercept (ln_k)
-    theta <- coef(fit)[2]
-    ln_k <- coef(fit)[1]
+    theta <- stats::coef(fit)[2]
+    ln_k <- stats::coef(fit)[1]
     
     # Calculate kappa (k) from ln(k)
     k <- exp(ln_k)

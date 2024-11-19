@@ -12,7 +12,8 @@ compute_monthly_parameters(
 )
 }
 \arguments{
-\item{data}{A string representing the input CSV file path.}
+\item{data}{Either a path to a CSV file containing historical rainfall data
+or a data frame.}
 
 \item{custom_bins}{A numeric vector specifying custom bins for RFE.}
 

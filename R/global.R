@@ -1,0 +1,1 @@
+utils::globalVariables(c("rainfall", "rfe", "Count", "month_day", ".data"))
