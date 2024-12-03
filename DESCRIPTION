@@ -1,6 +1,6 @@
 Package: outfillingR
 Title: Infill Missing Historical Climatic Data
-Version: 0.0.1
+Version: 0.0.2
 Authors@R: 
     person("Emily", "Black", role = c("aut", "trl", "dtc"))
     person("Lily", "Clements", email = "lily@idems.international", role = c("aut", "cre"),
