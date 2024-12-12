@@ -183,7 +183,7 @@ weather_generator <- function(data,
   }
   
   # Convert the list to a data frame
-  generated_df <- purrr::map_dfr(generated_weather, ~ as.data.frame(t(unlist(.))))
+  generated_df <- purrr::map_dfr(generated_data, ~ as.data.frame(t(unlist(.))))
   
   return(generated_df)
 }
