@@ -4,11 +4,13 @@
 #'
 #' @param data Either a path to a CSV file containing historical rainfall data 
 #'             or a data frame.
+#' @param date A string specifying the column name in `data` that contains 
+#'             the date values.
 #' @param custom_bins A numeric vector specifying custom bins for RFE.
 #' @param count_filter A numeric threshold defining the minimum number of values in each bin to include in the calculations
 #' @param min_rainy_days_threshold A numeric threshold for minimum rainy days.
 #' @return A data frame with the computed monthly parameters.
-compute_monthly_parameters <- function(data, custom_bins = c(1, 3, 5, 10, 15), count_filter = 10, min_rainy_days_threshold = 10) {
+compute_monthly_parameters <- function(data, date, custom_bins = c(1, 3, 5, 10, 15), count_filter = 10, min_rainy_days_threshold = 10) {
   # If data is a file path, read the CSV; otherwise, assume it's a data frame
   df <- if (is.character(data)) utils::read.csv(data) else data
   
@@ -38,8 +40,8 @@ compute_monthly_parameters <- function(data, custom_bins = c(1, 3, 5, 10, 15), c
     end_date <- sprintf("%02d-%02d", month, last_day)
     
     # Extract data for the current month
-    filtered_df <- extract_rows_by_date_range_across_years(df, start_date, end_date)
-    
+    filtered_df <- extract_rows_by_date_range_across_years(df, date = date, start_date, end_date)
+
     # Calculate conditional probabilities and other statistics
     result_df <- calculate_and_plot_conditional_probabilities(filtered_df, rfe_bin_edges = custom_bins, count_filter)
     #print(month)

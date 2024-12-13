@@ -40,7 +40,7 @@
 #'
 #' @return A data frame containing the generated synthetic rainfall data with 
 #'         the following columns:
-#'         - `Station_name`: The station name.
+#'         - `station_col`: The station name.
 #'         - `date`: The date.
 #'         - `lon`: Longitude of the station.
 #'         - `lat`: Latitude of the station.
@@ -75,7 +75,7 @@ weather_generator <- function(data,
   for (i in seq_len(nrow(df))) {
     row <- df[i, ]
     
-    station_name <- row[[station]]
+    if (!is.null(station)) station_col <- row[[station]]
     date_col <- row[[date]]
     rfe_col <- row[[rfe]]
     original_rainfall <- row[[rainfall]]
@@ -166,11 +166,12 @@ weather_generator <- function(data,
       } else {
         generated_rainfall <- 0
       }
+      # round to 1dp
+      generated_rainfall <- round(generated_rainfall, 1)
     }
     
     # Store the generated data in the list
     generated_data[[i]] <- list(
-      station_name = station_name,
       date = date_col,
       lon = row[[lon]],
       lat = row[[lat]],
@@ -178,10 +179,14 @@ weather_generator <- function(data,
       original_rainfall = original_rainfall,
       generated_rainfall = generated_rainfall
     )
+    
+    # Add station_col only if station is not NULL
+    if (!is.null(station)) {
+      generated_data[[i]]$station_col <- station_col
+    }
   }
   
   # Convert the list to a data frame
   generated_df <- purrr::map_dfr(generated_data, ~ as.data.frame(.))
-  
   return(generated_df)
 }

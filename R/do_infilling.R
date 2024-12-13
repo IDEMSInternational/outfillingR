@@ -125,7 +125,7 @@ do_infilling <- function(data,
                          
 ){
   distribution_flag <- match.arg(distribution_flag)
-  calibration_data <- select_calibration_data(data, station = "station", rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
+  calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
   
   # Call the function to compute monthly parameters
   dry_season_params <- list(
@@ -145,10 +145,10 @@ do_infilling <- function(data,
   )
   
   monthly_parameters <- compute_monthly_parameters(data = calibration_data,
+                                                   date = date,
                                                    custom_bins = custom_bins,
                                                    count_filter = count_filter,
                                                    min_rainy_days_threshold = min_rainy_days_threshold)
-  
   
   # Replace the values in monthly_parameters for the target months with dry_season_params values
   monthly_parameters[target_months, ] <- list(
@@ -185,5 +185,21 @@ do_infilling <- function(data,
     distribution_flag = 'gamma',  # Choose 'gamma' or 'lognormal'
     markovflag = markovflag
   )
-  return(generated_weather)
+  
+  # merge into original dataframe
+  generated_weather <- generated_weather %>%
+    dplyr::select(
+      dplyr::all_of(if (is.null(station)) c("date", "generated_rainfall") else c("station_col", "date", "generated_rainfall"))
+    )
+  data <- data %>%
+    dplyr::full_join(
+      generated_weather,
+      by = if (is.null(station)) {
+        setNames("date", rlang::as_name(rlang::ensym(date)))  # Dynamically map the date variable
+      } else {
+        setNames(c("station_col", "date"), c(rlang::as_name(rlang::ensym(station)), rlang::as_name(rlang::ensym(date))))
+      }
+    )
+  
+  return(data)
 }

@@ -6,6 +6,7 @@
 \usage{
 compute_monthly_parameters(
   data,
+  date,
   custom_bins = c(1, 3, 5, 10, 15),
   count_filter = 10,
   min_rainy_days_threshold = 10
@@ -14,6 +15,9 @@ compute_monthly_parameters(
 \arguments{
 \item{data}{Either a path to a CSV file containing historical rainfall data
 or a data frame.}
+
+\item{date}{A string specifying the column name in \code{data} that contains
+the date values.}
 
 \item{custom_bins}{A numeric vector specifying custom bins for RFE.}
 
