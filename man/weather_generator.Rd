@@ -67,7 +67,7 @@ probability of rainfall depends on previous conditions.}
 \value{
 A data frame containing the generated synthetic rainfall data with
 the following columns:
-- \code{Station_name}: The station name.
+- \code{station_col}: The station name.
 - \code{date}: The date.
 - \code{lon}: Longitude of the station.
 - \code{lat}: Latitude of the station.

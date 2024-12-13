@@ -4,10 +4,13 @@
 \alias{extract_rows_by_date_range_across_years}
 \title{Extract Rows by Date Range Across Multiple Years}
 \usage{
-extract_rows_by_date_range_across_years(df, start_date, end_date)
+extract_rows_by_date_range_across_years(df, date, start_date, end_date)
 }
 \arguments{
-\item{df}{A data frame with a column named \code{date}, which should be of class \code{Date} or convertible to \code{Date}.}
+\item{df}{A data frame containing the \code{date} variable}
+
+\item{date}{A string specifying the column name in \code{df} that contains
+the date values.}
 
 \item{start_date}{A string in "MM-DD" format specifying the start of the date range.}
 
