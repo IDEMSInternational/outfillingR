@@ -62,9 +62,7 @@ weather_generator <- function(data,
   
   # If data is a file path, read the CSV; otherwise, assume it's a data frame
   df <- if (is.character(data)) utils::read.csv(data) else data
-  
-  monthly_params_df <- monthly_params_df %>% dplyr::mutate(dplyr::across(dplyr::everything(), fill_nearest))
-  
+
   generated_rainfall <- 0  # Initialise the generated rainfall
   generated_data <- list()  # Initialise list to store generated data
   
@@ -183,7 +181,7 @@ weather_generator <- function(data,
   }
   
   # Convert the list to a data frame
-  generated_df <- purrr::map_dfr(generated_data, ~ as.data.frame(t(unlist(.))))
+  generated_df <- purrr::map_dfr(generated_data, ~ as.data.frame(.))
   
   return(generated_df)
 }

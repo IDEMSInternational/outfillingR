@@ -149,6 +149,7 @@ do_infilling <- function(data,
                                                    count_filter = count_filter,
                                                    min_rainy_days_threshold = min_rainy_days_threshold)
   
+  
   # Replace the values in monthly_parameters for the target months with dry_season_params values
   monthly_parameters[target_months, ] <- list(
     Month = target_months,
@@ -166,6 +167,8 @@ do_infilling <- function(data,
     p0_rainyday = dry_season_params$p0_rainyday,
     p0_dryday = dry_season_params$p0_dryday
   )
+  
+  monthly_parameters <- monthly_parameters %>% dplyr::mutate(dplyr::across(dplyr::everything(), fill_nearest))
   
   # Check the updated monthly_parameters to ensure values were correctly substituted
   generated_weather <- weather_generator(
