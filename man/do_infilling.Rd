@@ -35,6 +35,7 @@ do_infilling(
   p0 = 0.001,
   p0_rainyday = 0.001,
   p0_dryday = 0.001,
+  set_seed = NULL,
   return_type = c("numeric", "data.frame")
 )
 }
@@ -133,6 +134,8 @@ a rainy day. Default is \code{0.001}.}
 
 \item{p0_dryday}{A numeric value for the probability of precipitation following
 a dry day. Default is \code{0.001}.}
+
+\item{set_seed}{An optional numerical value to set a seed for the analysis. Default \code{NULL}.}
 
 \item{return_type}{A string denoting whether to return the generated rainfall as a
 vector or in the data frame.}
