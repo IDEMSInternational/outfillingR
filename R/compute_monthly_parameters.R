@@ -44,8 +44,7 @@ compute_monthly_parameters <- function(data, date, custom_bins = c(1, 3, 5, 10, 
 
     # Calculate conditional probabilities and other statistics
     result_df <- calculate_and_plot_conditional_probabilities(filtered_df, rfe_bin_edges = custom_bins, count_filter)
-    #print(month)
-    #print(result_df)
+
     months <- c(months, month)
     if (nrow(result_df$filtered_probabilities_df) > 3){
       # Initialize variables

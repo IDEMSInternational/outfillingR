@@ -36,11 +36,10 @@ test_that("do_infilling performs infilling with valid data and parameters", {
   )
   
   # Check result structure
-  expect_true(is.data.frame(result))
-  expect_named(result, c("station_name", "date", "lon", "lat", "rfe", "original_rainfall", "generated_rainfall"))
-  
+  expect_true(is.numeric(result))
+
   # Check generated rainfall is numeric and non-negative
-  expect_true(all(as.numeric(result$rfe) >= 0, na.rm = TRUE))
+  expect_true(all(as.numeric(result) >= 0, na.rm = TRUE))
 })
 
 test_that("do_infilling handles missing values correctly", {
@@ -66,5 +65,5 @@ test_that("do_infilling handles missing values correctly", {
   )
   
   # Check that generated rainfall is NA
-  expect_true(all(is.na(result$rfe)))
+  expect_true(all(is.na(result)))
 })

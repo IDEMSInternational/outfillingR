@@ -207,9 +207,9 @@ do_infilling <- function(data,
       dplyr::full_join(
         generated_weather,
         by = if (is.null(station)) {
-          setNames("date", rlang::as_name(rlang::ensym(date)))  # Dynamically map the date variable
+          stats::setNames("date", rlang::as_name(rlang::ensym(date)))  # Dynamically map the date variable
         } else {
-          setNames(c("station_col", "date"), c(rlang::as_name(rlang::ensym(station)), rlang::as_name(rlang::ensym(date))))
+          stats::setNames(c("station_col", "date"), c(rlang::as_name(rlang::ensym(station)), rlang::as_name(rlang::ensym(date))))
         }
       )
     

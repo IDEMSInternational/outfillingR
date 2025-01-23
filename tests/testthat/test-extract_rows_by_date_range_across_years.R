@@ -6,7 +6,7 @@ test_that("extract_rows_by_date_range_across_years handles normal ranges within 
   )
   
   # Call the function with a normal range
-  result <- extract_rows_by_date_range_across_years(df, start_date = "02-01", end_date = "03-31")
+  result <- extract_rows_by_date_range_across_years(df, date = "date", start_date = "02-01", end_date = "03-31")
   
   # Expected rows
   expected <- (df[2:3, ])
@@ -26,7 +26,7 @@ test_that("extract_rows_by_date_range_across_years handles ranges crossing the y
   )
   
   # Call the function with a range crossing the year boundary
-  result <- extract_rows_by_date_range_across_years(df, start_date = "12-01", end_date = "01-15")
+  result <- extract_rows_by_date_range_across_years(df, date = "date", start_date = "12-01", end_date = "01-15")
   
   # Expected rows
   expected <- df[c(1, 2, 3), ]
@@ -40,7 +40,7 @@ test_that("extract_rows_by_date_range_across_years handles empty data frames gra
   df <- data.frame(date = as.Date(character()), value = numeric())
   
   # Call the function
-  result <- extract_rows_by_date_range_across_years(df, start_date = "02-01", end_date = "03-31")
+  result <- extract_rows_by_date_range_across_years(df, date = "date", start_date = "02-01", end_date = "03-31")
   
   # Check the result
   expect_equal(nrow(result), 0)
@@ -55,7 +55,7 @@ test_that("extract_rows_by_date_range_across_years works with leap years", {
   )
   
   # Call the function for a range covering February
-  result <- extract_rows_by_date_range_across_years(df, start_date = "02-28", end_date = "03-01")
+  result <- extract_rows_by_date_range_across_years(df, date = "date", start_date = "02-28", end_date = "03-01")
   
   # Expected rows
   expected <- df[c(1, 2, 3, 4, 5), ]
@@ -72,7 +72,7 @@ test_that("extract_rows_by_date_range_across_years handles full-year range", {
   )
   
   # Call the function with the full-year range
-  result <- extract_rows_by_date_range_across_years(df, start_date = "01-01", end_date = "12-31")
+  result <- extract_rows_by_date_range_across_years(df, date = "date", start_date = "01-01", end_date = "12-31")
   
   # Check the result matches the input
   expect_equal(result, df)
