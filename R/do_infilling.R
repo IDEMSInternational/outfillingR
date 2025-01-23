@@ -70,6 +70,7 @@
 #'                    a rainy day. Default is `0.001`.
 #' @param p0_dryday A numeric value for the probability of precipitation following 
 #'                  a dry day. Default is `0.001`.
+#' @param set_seed An optional numerical value to set a seed for the analysis. Default `NULL`. 
 #' @param return_type A string denoting whether to return the generated rainfall as a
 #'                  vector or in the data frame.
 #'
@@ -125,12 +126,15 @@ do_infilling <- function(data,
                          p0=0.001,
                          p0_rainyday=0.001,
                          p0_dryday=0.001,
+                         set_seed = NULL,
                          return_type = c("numeric", "data.frame")
                          
 ){
   distribution_flag <- match.arg(distribution_flag)
   return_type <- match.arg(return_type)
   calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
+  
+  if (!is.null(set_seed)) set.seed(set_seed)
   
   # Call the function to compute monthly parameters
   dry_season_params <- list(
@@ -191,7 +195,7 @@ do_infilling <- function(data,
     markovflag = markovflag
   )
   
-  if (return_type == "column"){
+  if (return_type == "numeric"){
     return(generated_weather$generated_rainfall)
   } else {
     # merge into original dataframe
