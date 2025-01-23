@@ -14,7 +14,7 @@ do_infilling(
   metadata_station = NULL,
   lon,
   lat,
-  station_to_exclude,
+  station_to_exclude = NULL,
   rainfall_estimate_column,
   custom_bins = c(1, 3, 5, 10, 15, 20),
   count_filter = 10,
@@ -69,7 +69,7 @@ If \code{metadata} is \code{NULL}, this column is from \code{data}, otherwise
 this is from \code{metadata}}
 
 \item{station_to_exclude}{A string specifying the station to exclude from
-calibration data.}
+calibration data (Optional).}
 
 \item{rainfall_estimate_column}{A string specifying the column name in \code{data}
 that contains rainfall estimates used for

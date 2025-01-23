@@ -27,7 +27,7 @@
 #'            If `metadata` is `NULL`, this column is from `data`, otherwise
 #'            this is from `metadata`
 #' @param station_to_exclude A string specifying the station to exclude from 
-#'                           calibration data.
+#'                           calibration data (Optional).
 #' @param rainfall_estimate_column A string specifying the column name in `data` 
 #'                                 that contains rainfall estimates used for 
 #'                                 calibration.
@@ -102,7 +102,8 @@ do_infilling <- function(data,
                          metadata_station = NULL,
                          lon,
                          lat,
-                         station_to_exclude, rainfall_estimate_column,
+                         station_to_exclude = NULL,
+                         rainfall_estimate_column,
                          custom_bins = c(1, 3, 5, 10, 15, 20),
                          count_filter = 10,
                          min_rainy_days_threshold = 50,
