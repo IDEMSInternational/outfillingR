@@ -34,7 +34,8 @@ do_infilling(
   theta = 2,
   p0 = 0.001,
   p0_rainyday = 0.001,
-  p0_dryday = 0.001
+  p0_dryday = 0.001,
+  return_type = c("numeric", "data.frame")
 )
 }
 \arguments{
@@ -132,6 +133,9 @@ a rainy day. Default is \code{0.001}.}
 
 \item{p0_dryday}{A numeric value for the probability of precipitation following
 a dry day. Default is \code{0.001}.}
+
+\item{return_type}{A string denoting whether to return the generated rainfall as a
+vector or in the data frame.}
 }
 \value{
 A data frame containing the infilled rainfall data, including columns

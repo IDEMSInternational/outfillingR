@@ -70,6 +70,8 @@
 #'                    a rainy day. Default is `0.001`.
 #' @param p0_dryday A numeric value for the probability of precipitation following 
 #'                  a dry day. Default is `0.001`.
+#' @param return_type A string denoting whether to return the generated rainfall as a
+#'                  vector or in the data frame.
 #'
 #' @export
 #' @return A data frame containing the infilled rainfall data, including columns 
@@ -122,10 +124,12 @@ do_infilling <- function(data,
                          theta=2,
                          p0=0.001,
                          p0_rainyday=0.001,
-                         p0_dryday=0.001
+                         p0_dryday=0.001,
+                         return_type = c("numeric", "data.frame")
                          
 ){
   distribution_flag <- match.arg(distribution_flag)
+  return_type <- match.arg(return_type)
   calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
   
   # Call the function to compute monthly parameters
@@ -187,20 +191,24 @@ do_infilling <- function(data,
     markovflag = markovflag
   )
   
-  # merge into original dataframe
-  generated_weather <- generated_weather %>%
-    dplyr::select(
-      dplyr::all_of(if (is.null(station)) c("date", "generated_rainfall") else c("station_col", "date", "generated_rainfall"))
-    )
-  data <- data %>%
-    dplyr::full_join(
-      generated_weather,
-      by = if (is.null(station)) {
-        setNames("date", rlang::as_name(rlang::ensym(date)))  # Dynamically map the date variable
-      } else {
-        setNames(c("station_col", "date"), c(rlang::as_name(rlang::ensym(station)), rlang::as_name(rlang::ensym(date))))
-      }
-    )
-  
-  return(data)
+  if (return_type == "column"){
+    return(generated_weather$generated_rainfall)
+  } else {
+    # merge into original dataframe
+    generated_weather <- generated_weather %>%
+      dplyr::select(
+        dplyr::all_of(if (is.null(station)) c("date", "generated_rainfall") else c("station_col", "date", "generated_rainfall"))
+      )
+    data <- data %>%
+      dplyr::full_join(
+        generated_weather,
+        by = if (is.null(station)) {
+          setNames("date", rlang::as_name(rlang::ensym(date)))  # Dynamically map the date variable
+        } else {
+          setNames(c("station_col", "date"), c(rlang::as_name(rlang::ensym(station)), rlang::as_name(rlang::ensym(date))))
+        }
+      )
+    
+    return(data)
+  }
 }
