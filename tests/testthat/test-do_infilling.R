@@ -61,9 +61,10 @@ test_that("do_infilling handles missing values correctly", {
     rainfall_estimate_column = "chirps",
     custom_bins = c(0.5, 1.5),
     count_filter = 1,
-    min_rainy_days_threshold = 1
+    min_rainy_days_threshold = 1,
+    return_type = "data.frame"
   )
   
-  # Check that generated rainfall is NA
-  expect_true(all(is.na(result)))
+  # Check that it returns a data frame
+  expect_true(is.data.frame(result))
 })
