@@ -14,7 +14,7 @@ do_infilling(
   metadata_station = NULL,
   lon,
   lat,
-  station_to_exclude,
+  station_to_exclude = NULL,
   rainfall_estimate_column,
   custom_bins = c(1, 3, 5, 10, 15, 20),
   count_filter = 10,
@@ -34,7 +34,9 @@ do_infilling(
   theta = 2,
   p0 = 0.001,
   p0_rainyday = 0.001,
-  p0_dryday = 0.001
+  p0_dryday = 0.001,
+  set_seed = NULL,
+  return_type = c("numeric", "data.frame")
 )
 }
 \arguments{
@@ -69,7 +71,7 @@ If \code{metadata} is \code{NULL}, this column is from \code{data}, otherwise
 this is from \code{metadata}}
 
 \item{station_to_exclude}{A string specifying the station to exclude from
-calibration data.}
+calibration data (Optional).}
 
 \item{rainfall_estimate_column}{A string specifying the column name in \code{data}
 that contains rainfall estimates used for
@@ -132,6 +134,11 @@ a rainy day. Default is \code{0.001}.}
 
 \item{p0_dryday}{A numeric value for the probability of precipitation following
 a dry day. Default is \code{0.001}.}
+
+\item{set_seed}{An optional numerical value to set a seed for the analysis. Default \code{NULL}.}
+
+\item{return_type}{A string denoting whether to return the generated rainfall as a
+vector or in the data frame.}
 }
 \value{
 A data frame containing the infilled rainfall data, including columns

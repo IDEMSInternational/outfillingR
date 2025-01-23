@@ -27,7 +27,7 @@
 #'            If `metadata` is `NULL`, this column is from `data`, otherwise
 #'            this is from `metadata`
 #' @param station_to_exclude A string specifying the station to exclude from 
-#'                           calibration data.
+#'                           calibration data (Optional).
 #' @param rainfall_estimate_column A string specifying the column name in `data` 
 #'                                 that contains rainfall estimates used for 
 #'                                 calibration.
@@ -70,6 +70,9 @@
 #'                    a rainy day. Default is `0.001`.
 #' @param p0_dryday A numeric value for the probability of precipitation following 
 #'                  a dry day. Default is `0.001`.
+#' @param set_seed An optional numerical value to set a seed for the analysis. Default `NULL`. 
+#' @param return_type A string denoting whether to return the generated rainfall as a
+#'                  vector or in the data frame.
 #'
 #' @export
 #' @return A data frame containing the infilled rainfall data, including columns 
@@ -102,7 +105,8 @@ do_infilling <- function(data,
                          metadata_station = NULL,
                          lon,
                          lat,
-                         station_to_exclude, rainfall_estimate_column,
+                         station_to_exclude = NULL,
+                         rainfall_estimate_column,
                          custom_bins = c(1, 3, 5, 10, 15, 20),
                          count_filter = 10,
                          min_rainy_days_threshold = 50,
@@ -121,11 +125,16 @@ do_infilling <- function(data,
                          theta=2,
                          p0=0.001,
                          p0_rainyday=0.001,
-                         p0_dryday=0.001
+                         p0_dryday=0.001,
+                         set_seed = NULL,
+                         return_type = c("numeric", "data.frame")
                          
 ){
   distribution_flag <- match.arg(distribution_flag)
+  return_type <- match.arg(return_type)
   calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
+  
+  if (!is.null(set_seed)) set.seed(set_seed)
   
   # Call the function to compute monthly parameters
   dry_season_params <- list(
@@ -186,20 +195,24 @@ do_infilling <- function(data,
     markovflag = markovflag
   )
   
-  # merge into original dataframe
-  generated_weather <- generated_weather %>%
-    dplyr::select(
-      dplyr::all_of(if (is.null(station)) c("date", "generated_rainfall") else c("station_col", "date", "generated_rainfall"))
-    )
-  data <- data %>%
-    dplyr::full_join(
-      generated_weather,
-      by = if (is.null(station)) {
-        setNames("date", rlang::as_name(rlang::ensym(date)))  # Dynamically map the date variable
-      } else {
-        setNames(c("station_col", "date"), c(rlang::as_name(rlang::ensym(station)), rlang::as_name(rlang::ensym(date))))
-      }
-    )
-  
-  return(data)
+  if (return_type == "numeric"){
+    return(generated_weather$generated_rainfall)
+  } else {
+    # merge into original dataframe
+    generated_weather <- generated_weather %>%
+      dplyr::select(
+        dplyr::all_of(if (is.null(station)) c("date", "generated_rainfall") else c("station_col", "date", "generated_rainfall"))
+      )
+    data <- data %>%
+      dplyr::full_join(
+        generated_weather,
+        by = if (is.null(station)) {
+          setNames("date", rlang::as_name(rlang::ensym(date)))  # Dynamically map the date variable
+        } else {
+          setNames(c("station_col", "date"), c(rlang::as_name(rlang::ensym(station)), rlang::as_name(rlang::ensym(date))))
+        }
+      )
+    
+    return(data)
+  }
 }
