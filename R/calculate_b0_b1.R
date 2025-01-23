@@ -12,14 +12,10 @@
 calculate_b0_b1 <- function(mean_rfe, conditional_prob_rain, bin_counts, min_rainy_days_threshold) {
   
   # If there are insufficient rainy days across bins, return b0 and b1 as 0
-  if (sum(bin_counts) < min_rainy_days_threshold) {
-    return(c(b0 = 0, b1 = 0))
-  }
+  if (sum(bin_counts) < min_rainy_days_threshold) return(c(b0 = 0, b1 = 0))
   
   # If there are fewer than 2 data points, return NA for b0 and b1
-  if (length(mean_rfe) < 2) {
-    return(c(b0 = NA, b1 = NA))
-  }
+  if (length(mean_rfe) < 2) return(c(b0 = NA, b1 = NA))
   
   tryCatch({
     # Fit logistic model using non-linear least squares
