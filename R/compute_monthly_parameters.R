@@ -47,6 +47,8 @@ compute_monthly_parameters <- function(data, date, custom_bins = c(1, 3, 5, 10, 
 
     months <- c(months, month)
     if (nrow(result_df$filtered_probabilities_df) > 3){
+      if (any(is.na(result_df$filtered_probabilities_df$Rainfall_Std))) stop("Unable to estimate standard deviation for rainfall. Try larger bin sizes?")
+      
       # Initialize variables
       b0 <- NA
       b1 <- NA
