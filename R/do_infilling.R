@@ -26,8 +26,9 @@
 #' @param lat A string specifying the column corresponding to latitude values.
 #'            If `metadata` is `NULL`, this column is from `data`, otherwise
 #'            this is from `metadata`
-#' @param station_to_exclude A string specifying the station to exclude from 
-#'                           calibration data (Optional).
+#' @param stations_to_include A string specifying the station to include from 
+#'                           the calibration data (Optional). Default is `NULL`,
+#'                           meaning that all stations are included.
 #' @param rainfall_estimate_column A string specifying the column name in `data` 
 #'                                 that contains rainfall estimates used for 
 #'                                 calibration.
@@ -94,7 +95,7 @@
 #'                             rfe = "rfe",
 #'                             lon = "lon",
 #'                             lat = "lat",
-#'                             station_to_exclude = "PETAUKE MET",
+#'                             stations_to_include = "PETAUKE MET",
 #'                             rainfall_estimate_column = "chirps")
 #' }
 #' 
@@ -108,7 +109,7 @@ do_infilling <- function(data,
                          metadata_station = NULL,
                          lon,
                          lat,
-                         station_to_exclude = NULL,
+                         stations_to_include = NULL,
                          rainfall_estimate_column,
                          custom_bins = c(1, 3, 5, 10, 15, 20),
                          count_filter = 10,
@@ -138,7 +139,7 @@ do_infilling <- function(data,
   
   #' station to exclude to become stations to include (and amend code accordingly). Default everything()
   #' creates rfe column and selects columns to include/exclude in later calculations
-  calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
+  calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, stations_to_include = stations_to_include)
   
   if (!is.null(set_seed)) set.seed(set_seed)
 

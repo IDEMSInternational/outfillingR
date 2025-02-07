@@ -14,7 +14,7 @@ do_infilling(
   metadata_station = NULL,
   lon,
   lat,
-  station_to_exclude = NULL,
+  stations_to_include = NULL,
   rainfall_estimate_column,
   custom_bins = c(1, 3, 5, 10, 15, 20),
   count_filter = 10,
@@ -70,8 +70,9 @@ this is from \code{metadata}}
 If \code{metadata} is \code{NULL}, this column is from \code{data}, otherwise
 this is from \code{metadata}}
 
-\item{station_to_exclude}{A string specifying the station to exclude from
-calibration data (Optional).}
+\item{stations_to_include}{A string specifying the station to include from
+the calibration data (Optional). Default is \code{NULL},
+meaning that all stations are included.}
 
 \item{rainfall_estimate_column}{A string specifying the column name in \code{data}
 that contains rainfall estimates used for
@@ -167,7 +168,7 @@ infill_data <- do_infilling(data = zambia_data,
                             rfe = "rfe",
                             lon = "lon",
                             lat = "lat",
-                            station_to_exclude = "PETAUKE MET",
+                            stations_to_include = "PETAUKE MET",
                             rainfall_estimate_column = "chirps")
 }
 

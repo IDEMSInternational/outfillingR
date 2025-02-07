@@ -9,10 +9,10 @@
 #' @param station A string specifying the column name in `data` that contains 
 #'                the station names.
 #' @param rainfall_estimate_column A string representing the column name with rainfall estimates to be used in calibration.
-#' @param station_to_exclude A string representing the name of the station to exclude from the calibration data (Optional).
+#' @param stations_to_include A string representing the name of the station to exclude from the calibration data (Optional).
 #' @param save A logical column indicating whether to save the resulting data frame or not. Default `FALSE`.
 #' @return A data frame with the calibration data (without rows from the excluded station).
-select_calibration_data <- function(data, station, rainfall_estimate_column, station_to_exclude = NULL, save = FALSE) {
+select_calibration_data <- function(data, station, rainfall_estimate_column, stations_to_include = NULL, save = FALSE) {
   
   # If data is a file path, read the CSV; otherwise, assume it's a data frame
   df <- if (is.character(data)) utils::read.csv(data, stringsAsFactors = FALSE) else data
@@ -20,8 +20,8 @@ select_calibration_data <- function(data, station, rainfall_estimate_column, sta
   # Read CSV and select relevant column, excluding specified station
   calibration_data <- df %>% dplyr::mutate(rfe = .data[[rainfall_estimate_column]])
   
-  if (!is.null(station_to_exclude)){
-    calibration_data <- calibration_data %>% dplyr::filter(!.data[[station]] %in% station_to_exclude)
+  if (!is.null(stations_to_include)){
+    calibration_data <- calibration_data %>% dplyr::filter(.data[[station]] %in% stations_to_include)
   }
   
   if (save) utils::write.csv(calibration_data, "calibration_data.csv")
