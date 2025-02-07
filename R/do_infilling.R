@@ -209,7 +209,8 @@ do_infilling <- function(data,
   generated_weather <- generated_weather %>% dplyr::mutate(outfilled_rainfall = ifelse(is.na(original_rainfall), generated_rainfall, original_rainfall))
   
   if (return_type == "numeric"){
-    return(generated_weather$outfilled_rainfall)
+    generated_weather <- generated_weather %>% dplyr::select(c(generated_rainfall, outfilled_rainfall))
+    return(generated_weather)
   } else {
     # merge into original dataframe
     generated_weather <- generated_weather %>%
