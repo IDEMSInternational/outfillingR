@@ -26,8 +26,9 @@
 #' @param lat A string specifying the column corresponding to latitude values.
 #'            If `metadata` is `NULL`, this column is from `data`, otherwise
 #'            this is from `metadata`
-#' @param station_to_exclude A string specifying the station to exclude from 
-#'                           calibration data (Optional).
+#' @param stations_to_include A string specifying the station to include from 
+#'                           the calibration data (Optional). Default is `NULL`,
+#'                           meaning that all stations are included.
 #' @param rainfall_estimate_column A string specifying the column name in `data` 
 #'                                 that contains rainfall estimates used for 
 #'                                 calibration.
@@ -40,6 +41,9 @@
 #'                                 rainy days required for inclusion in calculations. 
 #'                                 Default is `50`.
 #' @param target_months A numeric vector specifying the months (as integers) to 
+#'                      apply dry season parameters. Default is `5:9` (May to 
+#'                      September).
+#' @param omit_months A numeric vector specifying the months (as integers) to 
 #'                      apply dry season parameters. Default is `5:9` (May to 
 #'                      September).
 #' @param distribution_flag A character string specifying the statistical distribution 
@@ -91,7 +95,7 @@
 #'                             rfe = "rfe",
 #'                             lon = "lon",
 #'                             lat = "lat",
-#'                             station_to_exclude = "PETAUKE MET",
+#'                             stations_to_include = "PETAUKE MET",
 #'                             rainfall_estimate_column = "chirps")
 #' }
 #' 
@@ -105,7 +109,7 @@ do_infilling <- function(data,
                          metadata_station = NULL,
                          lon,
                          lat,
-                         station_to_exclude = NULL,
+                         stations_to_include = NULL,
                          rainfall_estimate_column,
                          custom_bins = c(1, 3, 5, 10, 15, 20),
                          count_filter = 10,
@@ -132,10 +136,13 @@ do_infilling <- function(data,
 ){
   distribution_flag <- match.arg(distribution_flag)
   return_type <- match.arg(return_type)
-  calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, station_to_exclude = station_to_exclude)
+  
+  #' station to exclude to become stations to include (and amend code accordingly). Default everything()
+  #' creates rfe column and selects columns to include/exclude in later calculations
+  calibration_data <- select_calibration_data(data, station = station, rainfall_estimate_column = rainfall_estimate_column, stations_to_include = stations_to_include)
   
   if (!is.null(set_seed)) set.seed(set_seed)
-  
+
   # Call the function to compute monthly parameters
   dry_season_params <- list(
     b0 = b0,
@@ -153,12 +160,14 @@ do_infilling <- function(data,
     p0_dryday = p0_dryday
   )
   
+  # calculate monthly parameters
+  #' Model/adjustments defined here
   monthly_parameters <- compute_monthly_parameters(data = calibration_data,
                                                    date = date,
                                                    custom_bins = custom_bins,
                                                    count_filter = count_filter,
                                                    min_rainy_days_threshold = min_rainy_days_threshold)
-  
+
   # Replace the values in monthly_parameters for the target months with dry_season_params values
   monthly_parameters[target_months, ] <- list(
     Month = target_months,
@@ -177,9 +186,10 @@ do_infilling <- function(data,
     p0_dryday = dry_season_params$p0_dryday
   )
   
+  # fill NAs with the nearest value 
   monthly_parameters <- monthly_parameters %>% dplyr::mutate(dplyr::across(dplyr::everything(), fill_nearest))
   
-  # Check the updated monthly_parameters to ensure values were correctly substituted
+  # Generate the weather column
   generated_weather <- weather_generator(
     data = data,
     station = station,
@@ -191,17 +201,21 @@ do_infilling <- function(data,
     lon = lon,
     lat = lat,
     monthly_params_df = monthly_parameters,
-    distribution_flag = 'gamma',  # Choose 'gamma' or 'lognormal'
+    distribution_flag = distribution_flag,  # Choose 'gamma' or 'lognormal'
     markovflag = markovflag
   )
   
+  # create outfilled column
+  generated_weather <- generated_weather %>% dplyr::mutate(outfilled_rainfall = ifelse(is.na(original_rainfall), generated_rainfall, original_rainfall))
+  
   if (return_type == "numeric"){
-    return(generated_weather$generated_rainfall)
+    generated_weather <- generated_weather %>% dplyr::select(c(generated_rainfall, outfilled_rainfall))
+    return(generated_weather)
   } else {
     # merge into original dataframe
     generated_weather <- generated_weather %>%
       dplyr::select(
-        dplyr::all_of(if (is.null(station)) c("date", "generated_rainfall") else c("station_col", "date", "generated_rainfall"))
+        dplyr::all_of(if (is.null(station)) c("date", "generated_rainfall", "outfilled_rainfall") else c("station_col", "date", "generated_rainfall", "outfilled_rainfall"))
       )
     data <- data %>%
       dplyr::full_join(

@@ -59,7 +59,6 @@ weather_generator <- function(data,
                               monthly_params_df,
                               distribution_flag = 'gamma',
                               markovflag = TRUE) {
-  
   # If data is a file path, read the CSV; otherwise, assume it's a data frame
   df <- if (is.character(data)) utils::read.csv(data) else data
 
@@ -72,7 +71,7 @@ weather_generator <- function(data,
   }
   
   # Loop through each row of the data
-  for (i in seq_len(nrow(df))) {
+  for (i in 1:nrow(df)) {
     row <- df[i, ]
     
     if (!is.null(station)) station_col <- row[[station]]
@@ -128,10 +127,10 @@ weather_generator <- function(data,
       
       # Clamp probability to [0, 1]
       prob_precipitation <- max(0, min(prob_precipitation, 1))
-      
+
       # Determine if rainfall occurred (Bernoulli trial)
       rain_occurred <- stats::rbinom(1, 1, prob_precipitation)
-      
+
       # If rain occurred, calculate the amount
       if (rain_occurred == 1) {
         if (distribution_flag == 'gamma') {
@@ -150,7 +149,6 @@ weather_generator <- function(data,
             mean_rainfall <- a0 + a1 * 0.1
             shape <- mean_rainfall^2 / variance_rainfall
             scale <- variance_rainfall / mean_rainfall
-            
             generated_rainfall <- stats::rgamma(1, shape=shape, scale=scale)
             #ECB note. In R the generated rainfall seems to blow up sometimes when rfe_col is low. This is a temporary fix
             
@@ -185,7 +183,7 @@ weather_generator <- function(data,
       generated_data[[i]]$station_col <- station_col
     }
   }
-  
+
   # Convert the list to a data frame
   generated_df <- purrr::map_dfr(generated_data, ~ as.data.frame(.))
   return(generated_df)

@@ -8,7 +8,7 @@ select_calibration_data(
   data,
   station,
   rainfall_estimate_column,
-  station_to_exclude = NULL,
+  stations_to_include = NULL,
   save = FALSE
 )
 }
@@ -21,7 +21,7 @@ the station names.}
 
 \item{rainfall_estimate_column}{A string representing the column name with rainfall estimates to be used in calibration.}
 
-\item{station_to_exclude}{A string representing the name of the station to exclude from the calibration data (Optional).}
+\item{stations_to_include}{A string representing the name of the station to exclude from the calibration data (Optional).}
 
 \item{save}{A logical column indicating whether to save the resulting data frame or not. Default \code{FALSE}.}
 }

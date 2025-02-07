@@ -14,7 +14,7 @@ do_infilling(
   metadata_station = NULL,
   lon,
   lat,
-  station_to_exclude = NULL,
+  stations_to_include = NULL,
   rainfall_estimate_column,
   custom_bins = c(1, 3, 5, 10, 15, 20),
   count_filter = 10,
@@ -70,8 +70,9 @@ this is from \code{metadata}}
 If \code{metadata} is \code{NULL}, this column is from \code{data}, otherwise
 this is from \code{metadata}}
 
-\item{station_to_exclude}{A string specifying the station to exclude from
-calibration data (Optional).}
+\item{stations_to_include}{A string specifying the station to include from
+the calibration data (Optional). Default is \code{NULL},
+meaning that all stations are included.}
 
 \item{rainfall_estimate_column}{A string specifying the column name in \code{data}
 that contains rainfall estimates used for
@@ -139,6 +140,10 @@ a dry day. Default is \code{0.001}.}
 
 \item{return_type}{A string denoting whether to return the generated rainfall as a
 vector or in the data frame.}
+
+\item{omit_months}{A numeric vector specifying the months (as integers) to
+apply dry season parameters. Default is \code{5:9} (May to
+September).}
 }
 \value{
 A data frame containing the infilled rainfall data, including columns
@@ -163,11 +168,14 @@ infill_data <- do_infilling(data = zambia_data,
                             rfe = "rfe",
                             lon = "lon",
                             lat = "lat",
-                            station_to_exclude = "PETAUKE MET",
+                            stations_to_include = "PETAUKE MET",
                             rainfall_estimate_column = "chirps")
 }
 
 }
 \seealso{
 \code{\link{weather_generator}}, \code{\link{compute_monthly_parameters}}
+station to exclude to become stations to include (and amend code accordingly). Default everything()
+creates rfe column and selects columns to include/exclude in later calculations
+Model/adjustments defined here
 }
