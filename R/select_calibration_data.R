@@ -20,7 +20,9 @@ select_calibration_data <- function(data, station, rainfall_estimate_column, sta
   # Read CSV and select relevant column, excluding specified station
   calibration_data <- df %>% dplyr::mutate(rfe = .data[[rainfall_estimate_column]])
   
-  if (!is.null(station_to_exclude)) calibration_data <- calibration_data %>% dplyr::filter(!station %in% station_to_exclude)
+  if (!is.null(station_to_exclude)){
+    calibration_data <- calibration_data %>% dplyr::filter(!.data[[station]] %in% station_to_exclude)
+  }
   
   if (save) utils::write.csv(calibration_data, "calibration_data.csv")
   

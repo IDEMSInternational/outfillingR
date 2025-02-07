@@ -139,6 +139,10 @@ a dry day. Default is \code{0.001}.}
 
 \item{return_type}{A string denoting whether to return the generated rainfall as a
 vector or in the data frame.}
+
+\item{omit_months}{A numeric vector specifying the months (as integers) to
+apply dry season parameters. Default is \code{5:9} (May to
+September).}
 }
 \value{
 A data frame containing the infilled rainfall data, including columns
@@ -170,4 +174,7 @@ infill_data <- do_infilling(data = zambia_data,
 }
 \seealso{
 \code{\link{weather_generator}}, \code{\link{compute_monthly_parameters}}
+station to exclude to become stations to include (and amend code accordingly). Default everything()
+creates rfe column and selects columns to include/exclude in later calculations
+Model/adjustments defined here
 }
