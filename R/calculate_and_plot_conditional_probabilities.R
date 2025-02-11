@@ -60,7 +60,7 @@ calculate_and_plot_conditional_probabilities <- function(filtered_df, rfe_bin_ed
     probability <- ifelse(total_count > 0, positive_rainfall_count / total_count, NA)
     average_rfe <- ifelse(total_count > 0, mean(bin_df$rfe, na.rm = TRUE), NA)
     rainfall_mean <- ifelse(total_count > 0, mean(bin_df$rainfall[bin_df$rainfall > 0], na.rm = TRUE), NA)
-    rainfall_std <- ifelse(total_count > 0, sd(bin_df$rainfall[bin_df$rainfall > 0], na.rm = TRUE), NA)
+    rainfall_std <- ifelse(total_count > 0, stats::sd(bin_df$rainfall[bin_df$rainfall > 0], na.rm = TRUE), NA)
     
     # Filter the bin data for rainy days and dry days
     rainyday_bin_df <- bin_df %>% dplyr::filter(previous_day_rain > 0)
