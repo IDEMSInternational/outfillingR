@@ -10,7 +10,7 @@ result <- select_calibration_data(
   data = data,
   station = "station",
   rainfall_estimate_column = "rainfall",
-  station_to_exclude = "Station1"
+  stations_to_include = "Station1"
 )
 
 test_that("select_calibration_data works with a data frame", {
@@ -19,10 +19,11 @@ test_that("select_calibration_data works with a data frame", {
   expect_true("rfe" %in% colnames(result))
   
   # Check station exclusion
-  expect_false(any(result$station == "Station1"))
+  expect_false(any(result$station == "Station2"))
+  expect_false(any(result$station == "Station3"))
   
   # Check rfe column values
-  expect_equal(result$rfe, c(20, 30))
+  expect_equal(result$rfe, c(10, 40))
 })
 
 test_that("select_calibration_data handles missing columns", {
@@ -38,7 +39,7 @@ test_that("select_calibration_data handles missing columns", {
       data = data,
       station = "station",
       rainfall_estimate_column = "rainfall",
-      station_to_exclude = "Station2"
+      stations_to_include = "Station2"
     )
   )
 })
