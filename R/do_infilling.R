@@ -43,9 +43,6 @@
 #' @param target_months A numeric vector specifying the months (as integers) to 
 #'                      apply dry season parameters. Default is `5:9` (May to 
 #'                      September).
-#' @param omit_months A numeric vector specifying the months (as integers) to 
-#'                      apply dry season parameters. Default is `5:9` (May to 
-#'                      September).
 #' @param distribution_flag A character string specifying the statistical distribution 
 #'                          to use for rainfall generation. Options are `"gamma"` 
 #'                          (default) or `"lognormal"`.
