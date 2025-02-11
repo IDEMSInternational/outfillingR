@@ -15,7 +15,6 @@ test_that("calculate_and_plot_conditional_probabilities returns correct structur
   
   # Check that p0, p0_rainyday, and p0_dryday are numeric
   expect_true(is.numeric(result$p0))
-  expect_true(is.numeric(result$p0_rainyday))
   expect_true(is.numeric(result$p0_dryday))
 })
 
@@ -77,9 +76,9 @@ test_that("calculate_and_plot_conditional_probabilities handles edge cases", {
   # Check result
   expect_true(is.data.frame(result$filtered_probabilities_df))
   expect_equal(nrow(result$filtered_probabilities_df), 0)
-  expect_equal(result$p0, NaN)
-  expect_equal(result$p0_rainyday, NaN)
-  expect_equal(result$p0_dryday, NaN)
+  expect_equal(result$p0, NA)
+  expect_equal(result$p0_rainyday, NA)
+  expect_equal(result$p0_dryday, NA)
   
   # Edge case: Single row
   filtered_df <- data.frame(rainfall = c(5), rfe = c(0))

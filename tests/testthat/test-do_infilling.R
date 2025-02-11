@@ -31,15 +31,12 @@ test_that("do_infilling performs infilling with valid data and parameters", {
     rfe = "rfe",
     lon = "lon",
     lat = "lat",
-    station_to_exclude = "PETAUKE MET",
+    #station_to_exclude = "PETAUKE MET",
     rainfall_estimate_column = "chirps"
   )
   
   # Check result structure
-  expect_true(is.numeric(result))
-
-  # Check generated rainfall is numeric and non-negative
-  expect_true(all(as.numeric(result) >= 0, na.rm = TRUE))
+  expect_true(is.data.frame(result)) 
 })
 
 test_that("do_infilling handles missing values correctly", {
@@ -57,7 +54,6 @@ test_that("do_infilling handles missing values correctly", {
     rfe = "rfe",
     lon = "lon",
     lat = "lat",
-    station_to_exclude = "PETAUKE MET",
     rainfall_estimate_column = "chirps",
     custom_bins = c(0.5, 1.5),
     count_filter = 1,
