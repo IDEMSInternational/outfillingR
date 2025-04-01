@@ -32,7 +32,10 @@
 #' @param rainfall_estimate_column A string specifying the column name in `data` 
 #'                                 that contains rainfall estimates used for 
 #'                                 calibration.
-#' @param custom_bins A numeric vector specifying custom bins for RFE values. 
+#' @param autobins Logical. If `TRUE`, bins for RFE are computed automatically using quantiles. Default `TRUE`.
+#' @param by_month Logical. If `TRUE` and `autobins` is also `TRUE`, bins are computed separately for each month. Default `TRUE`.
+#' @param n_bins Integer. The number of bins to create when `autobins = TRUE`. Default is `5`
+#' @param custom_bins Numeric vector. Used when `autobins = FALSE` to specify the RFE bin edges manually.
 #'                    Default is `c(1, 3, 5, 10, 15, 20)`.
 #' @param count_filter A numeric threshold specifying the minimum number of values 
 #'                     required in each bin to include in calculations. Default is 
@@ -108,6 +111,9 @@ do_infilling <- function(data,
                          lat,
                          stations_to_include = NULL,
                          rainfall_estimate_column,
+                         autobins = TRUE,
+                         by_month = TRUE,
+                         n_bins = 5, 
                          custom_bins = c(1, 3, 5, 10, 15, 20),
                          count_filter = 10,
                          min_rainy_days_threshold = 50,
@@ -131,6 +137,7 @@ do_infilling <- function(data,
                          return_type = c("numeric", "data.frame")
                          
 ){
+  if (n_bins < 5) stop("n_bins must be 5 or greater")
   distribution_flag <- match.arg(distribution_flag)
   return_type <- match.arg(return_type)
   
@@ -156,14 +163,33 @@ do_infilling <- function(data,
     p0_rainyday = p0_rainyday,
     p0_dryday = p0_dryday
   )
+
+  if (autobins){
+    all_bin_edges <- create_bins(data = data,
+                                 date = date,
+                                 rainfall = rainfall,
+                                 by_month = by_month,
+                                 n_bins = n_bins)
+    all_bin_edges <- unique(all_bin_edges)
+    if (!by_month){
+      # check for at least 3 groups - so at least four unique values
+      if (length(all_bin_edges) <= 4) stop("Too few bins given for this type of data. Try increasing bin size, and/or setting `by_month` as TRUE")
+    } else {
+      count_n <- all_bin_edges %>% dplyr::group_by(month) %>% dplyr::count()
+      if (all(count_n$n <= 4)) stop("Too few bins given for this type of data. Try increasing bin size, and/or setting `by_month` as FALSE")
+    }
+  } else {
+    all_bin_edges <- custom_bins
+  }
   
   # calculate monthly parameters
   #' Model/adjustments defined here
   monthly_parameters <- compute_monthly_parameters(data = calibration_data,
                                                    date = date,
-                                                   custom_bins = custom_bins,
+                                                   bin_edges = all_bin_edges,
                                                    count_filter = count_filter,
                                                    min_rainy_days_threshold = min_rainy_days_threshold)
+
 
   # Replace the values in monthly_parameters for the target months with dry_season_params values
   monthly_parameters[target_months, ] <- list(
@@ -226,4 +252,16 @@ do_infilling <- function(data,
     
     return(data)
   }
+  
+  # return_value <- c()
+  # if (return_estimates){
+  #   return_value <- c(return_value, "estimated_rainfall")
+  # }
+  # if (return_outfilled){
+  #   # create outfilled column
+  #   generated_weather <- generated_weather %>% dplyr::mutate(outfilled_rainfall = ifelse(is.na(original_rainfall), generated_rainfall, original_rainfall))
+  #   return_value <- c(return_value, "outfilled_rainfall")
+  # }
+  # generated_weather <- generated_weather %>% dplyr::select(c(dplyr::all_of(return_value)))
+  # return(generated_weather)
 }
