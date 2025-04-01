@@ -1,16 +1,37 @@
-#' Compute Monthly Parameters
+#' Compute Monthly Parameters from Rainfall Data
 #'
-#' Calculates monthly parameters based on rainfall data from a CSV file.
+#' This function computes a range of statistical parameters for each calendar month
+#' based on daily rainfall data. It can work with either a CSV file or a data frame,
+#' and uses rainfall frequency estimates (RFE) binned over custom or automatically 
+#' generated intervals. For each month, it estimates linear model coefficients 
+#' relating RFE to various conditional probabilities, mean rainfall, and other 
+#' statistical quantities.
 #'
-#' @param data Either a path to a CSV file containing historical rainfall data 
-#'             or a data frame.
-#' @param date A string specifying the column name in `data` that contains 
-#'             the date values.
-#' @param custom_bins A numeric vector specifying custom bins for RFE.
-#' @param count_filter A numeric threshold defining the minimum number of values in each bin to include in the calculations
-#' @param min_rainy_days_threshold A numeric threshold for minimum rainy days.
-#' @return A data frame with the computed monthly parameters.
-compute_monthly_parameters <- function(data, date, custom_bins = c(1, 3, 5, 10, 15), count_filter = 10, min_rainy_days_threshold = 10) {
+#' @param data A data frame or a file path to a CSV file containing daily rainfall data.
+#'             Must include at least a date column and a rainfall column.
+#' @param date A string giving the name of the column in `data` that contains the date values.
+#' @param bin_edges Either a data frame giving the custom bins by month, otherwise a numeric vector that specifies the RFE bin edges.
+#' @param count_filter Numeric. The minimum number of values in each bin for it to be used in the regression calculations.
+#' @param min_rainy_days_threshold Numeric. The minimum number of rainy days required to fit the probability models for rainy and dry days.
+#'
+#' @return A data frame with one row per month, containing the following columns:
+#' \describe{
+#'   \item{Month}{Integer month (1 = January, ..., 12 = December).}
+#'   \item{b0, b1}{Intercept and slope from a linear model of conditional probability vs. RFE.}
+#'   \item{a0, a1}{Intercept and slope from a linear model of mean rainfall vs. RFE.}
+#'   \item{b0_rainyday, b1_rainyday}{Intercept and slope for the probability of a rainy day vs. RFE.}
+#'   \item{b0_dryday, b1_dryday}{Intercept and slope for the probability of a dry day vs. RFE.}
+#'   \item{kappa, theta}{Parameters from a calibrated distribution of rainfall occurrence.}
+#'   \item{p0}{Baseline probability of rainfall.}
+#'   \item{p0_rainyday}{Baseline probability of rainfall on a rainy day.}
+#'   \item{p0_dryday}{Baseline probability of rainfall on a dry day.}
+#' }
+#'
+#' @details This function is designed to support rainfall modeling and simulation by 
+#' generating month-specific statistics. It uses helper functions such as 
+#' `extract_rows_by_date_range_across_years()`, `calculate_and_plot_conditional_probabilities()`, 
+#' `calculate_b0_b1()`, and `calibrate_kappa_theta()` which must be defined in the environment.
+compute_monthly_parameters <- function(data, date, bin_edges = c(1, 3, 5, 10, 15), count_filter = 10, min_rainy_days_threshold = 10) {
   # If data is a file path, read the CSV; otherwise, assume it's a data frame
   df <- if (is.character(data)) utils::read.csv(data) else data
   
@@ -31,21 +52,27 @@ compute_monthly_parameters <- function(data, date, custom_bins = c(1, 3, 5, 10, 
   p0_values_orig <- c()
   
   # Loop through each month (January to December)
-  for (month in 1:12) {
+  for (month_val in 1:12) {
+    if (is.data.frame(bin_edges)){
+      rfe_bin_edges <- unique(bin_edges %>% dplyr::filter(month == month_val) %>% dplyr::pull(quantiles))
+    } else {
+      rfe_bin_edges <- bin_edges
+    }
+    
     # Get the correct number of days in the current month (for any reference year, e.g., 2021)
-    last_day <- as.numeric(format(as.Date(paste0("2021-", month, "-01")) + lubridate::period(months = 1) - lubridate::days(1), "%d"))
+    last_day <- as.numeric(format(as.Date(paste0("2021-", month_val, "-01")) + lubridate::period(months = 1) - lubridate::days(1), "%d"))
     
     # Format the start and end dates for the current month
-    start_date <- sprintf("%02d-01", month)
-    end_date <- sprintf("%02d-%02d", month, last_day)
+    start_date <- sprintf("%02d-01", month_val)
+    end_date <- sprintf("%02d-%02d", month_val, last_day)
     
     # Extract data for the current month
-    filtered_df <- extract_rows_by_date_range_across_years(df, date = date, start_date, end_date)
-
+    filtered_df <- extract_rows_by_date_range_across_years(df, date, start_date, end_date)
+    
     # Calculate conditional probabilities and other statistics
-    result_df <- calculate_and_plot_conditional_probabilities(filtered_df, rfe_bin_edges = custom_bins, count_filter)
-
-    months <- c(months, month)
+    result_df <- calculate_and_plot_conditional_probabilities(filtered_df, rfe_bin_edges = rfe_bin_edges, count_filter)
+    
+    months <- c(months, month_val)
     if (nrow(result_df$filtered_probabilities_df) > 3){
       if (any(is.na(result_df$filtered_probabilities_df$Rainfall_Std))) stop("Unable to estimate standard deviation for rainfall. Try larger bin sizes?")
       
@@ -119,7 +146,7 @@ compute_monthly_parameters <- function(data, date, custom_bins = c(1, 3, 5, 10, 
       theta <- kappa_theta$theta
       
       # Store the results
-      cat("Data for month:", month, "\n")
+      cat("Data for month:", month_val, "\n")
       b0_values <- c(b0_values, b0)
       b1_values <- c(b1_values, b1)
       a0_values <- c(a0_values, a0)
@@ -136,7 +163,7 @@ compute_monthly_parameters <- function(data, date, custom_bins = c(1, 3, 5, 10, 
       p0_dryday_values <- c(p0_dryday_values, p0_dryday)
     } else {
       # Print a message and assign NA values for the month
-      cat("No data for month:", month, "\n")
+      cat("No data for month:", month_val, "\n")
       b0_values <- c(b0_values, NA)
       b1_values <- c(b1_values, NA)
       a0_values <- c(a0_values, NA)

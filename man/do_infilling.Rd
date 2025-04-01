@@ -16,6 +16,9 @@ do_infilling(
   lat,
   stations_to_include = NULL,
   rainfall_estimate_column,
+  autobins = TRUE,
+  by_month = TRUE,
+  n_bins = 5,
   custom_bins = c(1, 3, 5, 10, 15, 20),
   count_filter = 10,
   min_rainy_days_threshold = 50,
@@ -78,7 +81,13 @@ meaning that all stations are included.}
 that contains rainfall estimates used for
 calibration.}
 
-\item{custom_bins}{A numeric vector specifying custom bins for RFE values.
+\item{autobins}{Logical. If \code{TRUE}, bins for RFE are computed automatically using quantiles. Default \code{TRUE}.}
+
+\item{by_month}{Logical. If \code{TRUE} and \code{autobins} is also \code{TRUE}, bins are computed separately for each month. Default \code{TRUE}.}
+
+\item{n_bins}{Integer. The number of bins to create when \code{autobins = TRUE}. Default is \code{5}}
+
+\item{custom_bins}{Numeric vector. Used when \code{autobins = FALSE} to specify the RFE bin edges manually.
 Default is \code{c(1, 3, 5, 10, 15, 20)}.}
 
 \item{count_filter}{A numeric threshold specifying the minimum number of values
