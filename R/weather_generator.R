@@ -183,8 +183,14 @@ weather_generator <- function(data,
       generated_data[[i]]$station_col <- station_col
     }
   }
+  
+  # Replace NULLs with NA in each element
+  clean_list <- lapply(generated_data, function(x) {
+    x[sapply(x, is.null)] <- NA
+    as.data.frame(x, stringsAsFactors = FALSE)
+  })
+  
+  df <- do.call(rbind, lapply(clean_list, function(x) as.data.frame(x, stringsAsFactors = FALSE)))
 
-  # Convert the list to a data frame
-  generated_df <- purrr::map_dfr(generated_data, ~ as.data.frame(.))
-  return(generated_df)
+  return(df)
 }
